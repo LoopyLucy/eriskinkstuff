@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "sources": [
+    { "type": "single", "resource": "eriskinkstuff:entity/dyable_collar_base" },
+    { "type": "single", "resource": "eriskinkstuff:entity/gold_collar" },
+    { "type": "single", "resource": "eriskinkstuff:entity/ringed_collar" },
+    { "type": "single", "resource": "eriskinkstuff:entity/studded_collar" }
+  ]
+}
