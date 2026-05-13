@@ -5,7 +5,6 @@ import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -13,9 +12,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.client.event.RenderArmEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 @Mod(value = ErisKinkStuff.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = ErisKinkStuff.MODID, value = Dist.CLIENT)
@@ -39,25 +35,6 @@ public class ErisKinkStuffClient {
         ClientAccess.MITTENS_MODEL = new MittensModel(
                 Minecraft.getInstance().getEntityModels().bakeLayer(ModModelLayers.MITTENS)
         );
-    }
-
-    @SubscribeEvent
-    public static void onRenderArm(RenderArmEvent event) {
-        Player player = Minecraft.getInstance().player;
-        if (player == null || ClientAccess.MITTENS_MODEL == null) return;
-
-        // Fetch your inventory handler using the new API
-        CuriosApi.getCuriosInventory(player).ifPresent(inventory -> {
-            inventory.findFirstCurio(ModItems.MITTENS.get()).ifPresent(slotResult -> {
-
-                // Call our new First-Person Mitten handler
-                FirstPersonMittenRenderer.renderFromArmEvent(
-                        event,
-                        slotResult.stack(),
-                        ClientAccess.MITTENS_MODEL
-                );
-            });
-        });
     }
 
     @SubscribeEvent

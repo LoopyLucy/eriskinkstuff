@@ -1,6 +1,10 @@
 package co.uk.loopylucy.kinkstuff;
 
 import co.uk.loopylucy.kinkstuff.item.ModItems;
+import co.uk.loopylucy.kinkstuff.network.LeashServerPacket;
+import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
@@ -29,6 +33,7 @@ public class ErisKinkStuff {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerCapabilities);
+        modEventBus.addListener(this::registerPackets);
         NeoForge.EVENT_BUS.register(this);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -45,10 +50,20 @@ public class ErisKinkStuff {
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.COLLAR.get());
         event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.MITTENS.get());
+        LOGGER.info("Capabilities Registered!");
+    }
+
+    private void registerPackets(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(MODID);
+
+        registrar.playToClient(LeashSyncPacket.TYPE, LeashSyncPacket.CODEC, LeashSyncPacket::handle);
+        registrar.playToServer(LeashServerPacket.TYPE, LeashServerPacket.CODEC, LeashServerPacket::handle);
+        LOGGER.info("Packets Registered!");
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("Server Loaded!");
     }
+
 }
