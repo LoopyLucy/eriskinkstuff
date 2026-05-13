@@ -34,7 +34,7 @@ public class ErisKinkStuff {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            modContainer.registerExtensionPoint(IConfigScreenFactory.class, (container, screen) -> new ConfigurationScreen(container, screen));
+            modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
     }
 
@@ -44,6 +44,7 @@ public class ErisKinkStuff {
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.COLLAR.get());
+        event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.MITTENS.get());
     }
 
     @SubscribeEvent

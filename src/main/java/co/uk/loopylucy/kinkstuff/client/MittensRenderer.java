@@ -1,7 +1,7 @@
 package co.uk.loopylucy.kinkstuff.client;
 
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
-import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
+import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
@@ -16,12 +16,11 @@ import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
-public class CollarRenderer implements ICurioRenderer {
-    private static final ResourceLocation BASE_TEXTURE = ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "textures/entity/dyeable_collar_base.png");
-    private static final ResourceLocation PENDANT_TEXTURE = ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "textures/entity/gold_collar.png");
-    private final CollarModel model;
+public class MittensRenderer implements ICurioRenderer {
+    private static final ResourceLocation BASE_TEXTURE = ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "textures/entity/mittens_dyeable.png");
+    private final MittensModel model;
 
-    public CollarRenderer(CollarModel model) {
+    public MittensRenderer(MittensModel model) {
         this.model = model;
     }
 
@@ -53,25 +52,23 @@ public class CollarRenderer implements ICurioRenderer {
             //ErisKinkStuff.LOGGER.debug("CollarRenderer.render called for entity {}", slotContext.entity());
 
             // 1. Setup the color
-            int colour = ((CollarItem)stack.getItem()).getColor(stack);
+            int colour = ((MittensItem)stack.getItem()).getColor(stack);
             int finalARGB = 0xFF000000 | (colour & 0xFFFFFF);
 
             // 2. Sync animations
             this.model.prepareMobModel(slotContext.entity(), limbSwing, limbSwingAmount, partialTicks);
             this.model.setupAnim(slotContext.entity(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-            // 3. Parent to body
+            VertexConsumer vertexConsumer = renderTypeBuffer.getBuffer(RenderType.entityCutout(BASE_TEXTURE));
+
             matrixStack.pushPose();
-            this.model.body.translateAndRotate(matrixStack);
+            this.model.leftArm.translateAndRotate(matrixStack);
+            this.model.leftMitten.render(matrixStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, finalARGB);
+            matrixStack.popPose();
 
-            VertexConsumer baseVertexConsumer = renderTypeBuffer.getBuffer(RenderType.entityCutout(BASE_TEXTURE));
-            this.model.dyeableParts.render(matrixStack, baseVertexConsumer, light, OverlayTexture.NO_OVERLAY, finalARGB);
-
-            matrixStack.translate(0.0F, -0.02F, 0.0F);
-            matrixStack.scale(0.6F, 0.6F, 1.0F);
-            VertexConsumer pendantVertexConsumer = renderTypeBuffer.getBuffer(RenderType.entityCutout(PENDANT_TEXTURE));
-            this.model.staticParts.render(matrixStack, pendantVertexConsumer, light, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
-
+            matrixStack.pushPose();
+            this.model.rightArm.translateAndRotate(matrixStack);
+            this.model.rightMitten.render(matrixStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, finalARGB);
             matrixStack.popPose();
         }
     }

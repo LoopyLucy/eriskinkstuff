@@ -7,4 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 public class ModModelLayers {
     public static final ModelLayerLocation COLLAR = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "collar"), "main");
+
+    public static final ModelLayerLocation MITTENS = new ModelLayerLocation(
+            ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "mittens"), "main");
 }
