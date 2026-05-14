@@ -3,6 +3,7 @@ package co.uk.loopylucy.kinkstuff;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashServerPacket;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
+import co.uk.loopylucy.kinkstuff.sound.ModSounds;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
@@ -29,11 +30,13 @@ public class ErisKinkStuff {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public ErisKinkStuff(IEventBus modEventBus, ModContainer modContainer) {
-        ModItems.register(modEventBus);
-
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerPackets);
+
+        ModItems.register(modEventBus);
+        ModSounds.register(modEventBus);
+
         NeoForge.EVENT_BUS.register(this);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

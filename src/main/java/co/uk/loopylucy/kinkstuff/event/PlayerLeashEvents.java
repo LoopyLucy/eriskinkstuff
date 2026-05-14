@@ -3,13 +3,15 @@ package co.uk.loopylucy.kinkstuff.event;
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -17,6 +19,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.*;
@@ -67,78 +70,123 @@ public class PlayerLeashEvents {
         }
     }
 
+    // Inside PlayerLeashEvents.java:
+    // Helper map to track how many consecutive ticks a player has been stuck far away
+    private static final Map<UUID, Integer> STUCK_TICKS = new HashMap<>();
+
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player leashedPlayer = event.getEntity();
-        if (leashedPlayer.level().isClientSide()) return;
+        if (leashedPlayer.level().isClientSide()) return; // Server thread physics only
 
-        if (LEASHED_PLAYERS.containsKey(leashedPlayer.getUUID())) {
-            // Safety: Un-equipping collar snaps leash
+        if (isLeashed(leashedPlayer)) {
             if (!isWearingCollar(leashedPlayer)) {
                 releaseLeash(leashedPlayer, true);
+                STUCK_TICKS.remove(leashedPlayer.getUUID());
                 return;
             }
 
             LivingEntity holder = getLeashHolder(leashedPlayer);
             if (holder != null) {
-                // Break leash conditions (Dimensional shifts, death, or extreme distance thresholds)
-                if (holder.level() != leashedPlayer.level() || !holder.isAlive() || leashedPlayer.distanceTo(holder) > 16.0F) {
+                if (holder.level() != leashedPlayer.level() || !holder.isAlive() || leashedPlayer.distanceTo(holder) > 24.0F) {
                     releaseLeash(leashedPlayer, true);
+                    STUCK_TICKS.remove(leashedPlayer.getUUID());
                     return;
                 }
 
-                double distance = leashedPlayer.distanceTo(holder);
-                if (distance > 4.0D) {
-                    Vec3 direction = holder.position().subtract(leashedPlayer.position()).normalize();
+                double totalDistance = leashedPlayer.distanceTo(holder);
 
-                    // Force a server-controlled knockback packet directly into the target client's packet loop
-                    if (leashedPlayer instanceof ServerPlayer serverPlayer) {
-                        // knockback(strength, ratioX, ratioZ)
-                        serverPlayer.knockback(0.4F, -direction.x, -direction.z);
-                        // Force an engine update packet to override the velocity array instantly
+                // 1. ISOLATE VECTOR DISTANCES
+                double dx = holder.getX() - leashedPlayer.getX();
+                double dy = (holder.getY() + holder.getEyeHeight() * 0.5D) - (leashedPlayer.getY() + leashedPlayer.getEyeHeight());
+                double dz = holder.getZ() - leashedPlayer.getZ();
+                double horizontalDistance = Mth.sqrt((float) (dx * dx + dz * dz));
+
+                // Track horizontal stuck loops for the fallback teleport
+                if (horizontalDistance > 8.0D) {
+                    int ticksStuck = STUCK_TICKS.getOrDefault(leashedPlayer.getUUID(), 0) + 1;
+                    STUCK_TICKS.put(leashedPlayer.getUUID(), ticksStuck);
+
+                    if (ticksStuck > 30) {
+                        if (leashedPlayer instanceof ServerPlayer serverPlayer) {
+                            net.minecraft.world.phys.Vec3 fallbackPos = holder.position().add(holder.getLookAngle().scale(-1.0D));
+                            serverPlayer.teleportTo((ServerLevel) serverPlayer.level(), fallbackPos.x, holder.getY(), fallbackPos.z, Set.of(), serverPlayer.getYRot(), serverPlayer.getXRot());
+                            STUCK_TICKS.put(leashedPlayer.getUUID(), 0);
+                            return;
+                        }
+                    }
+                } else {
+                    STUCK_TICKS.put(leashedPlayer.getUUID(), 0);
+                }
+
+                // 2. CALCULATE ROTATIONAL LOOK ANGLES
+                float targetYaw = (float) (Mth.atan2(dz, dx) * (180D / Math.PI)) - 90F;
+                float targetPitch = (float) -(Mth.atan2(dy, horizontalDistance) * (180D / Math.PI));
+                targetYaw = Mth.wrapDegrees(targetYaw);
+                targetPitch = Mth.clamp(targetPitch, -90F, 90F);
+
+                // 3. ENFORCE PHYSICS VIA KNOCKBACK AND LOOK-LOCK PACKETS
+                if (leashedPlayer instanceof ServerPlayer serverPlayer) {
+
+                    // If they wander outside the 4-block slack threshold, apply knockback momentum
+                    if (totalDistance > 4.0D) {
+                        net.minecraft.world.phys.Vec3 direction = holder.position().subtract(leashedPlayer.position()).normalize();
+
+                        // Scale the knockback strength based on how far away they are being pulled
+                        float pullStrength = (float) (totalDistance - 4.0D) * 0.15F;
+                        pullStrength = Mth.clamp(pullStrength, 0.2F, 0.8F); // Clamp to prevent extreme launching
+
+                        // Apply server-side knockback vector force
+                        // Arguments: strength, xRatio, zRatio
+                        // We invert the direction vectors so they are pulled TOWARD you rather than pushed away
+                        serverPlayer.knockback(pullStrength, -direction.x, -direction.z);
+
+                        // Vertical assist: If you are significantly higher up, add an extra lift boost
+                        if (holder.getY() > leashedPlayer.getY() + 0.5D) {
+                            serverPlayer.setDeltaMovement(serverPlayer.getDeltaMovement().add(0.0D, 0.2D, 0.0D));
+                        }
+
+                        // Immediately force an explicit velocity packet update to keep physics synchronized
                         serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
                     }
+
+                    // 4. FORCE THE LOOK-LOCK (Absolute Rotation)
+                    // We pass 0.0 for X, Y, Z because position movement is handled by the knockback physics loop.
+                    // Leaving X, Y, Z as relative means their position stays untouched by this packet, completely stopping glitches.
+                    serverPlayer.connection.send(new ClientboundPlayerPositionPacket(
+                            0.0D,
+                            0.0D,
+                            0.0D,
+                            targetYaw,
+                            targetPitch,
+                            Set.of(RelativeMovement.X, RelativeMovement.Y, RelativeMovement.Z), // Keep position relative (unmodified)
+                            0
+                    ));
+
+                    // Instantly align internal orientation variables
+                    serverPlayer.setYRot(targetYaw);
+                    serverPlayer.setXRot(targetPitch);
+                    serverPlayer.setYHeadRot(targetYaw);
+                    serverPlayer.setYBodyRot(targetYaw);
                 }
-
-                if (distance > 15.0D) {
-                    Vec3 direction = holder.position().subtract(leashedPlayer.position()).normalize();
-                    double pullIntensity = distance - 4.0D; // Tweak this decimal to increase/decrease speed
-                    Vec3 pullVelocity = direction.scale(pullIntensity);
-
-                    if (leashedPlayer instanceof ServerPlayer serverPlayer) {
-                        // Calculate the absolute destination coordinates
-                        double targetX = serverPlayer.getX() + pullVelocity.x;
-                        double targetY = serverPlayer.getY();
-                        double targetZ = serverPlayer.getZ() + pullVelocity.z;
-
-                        // Force a server-authoritative teleport tracking sync
-                        // Parameters: (ServerLevel, X, Y, Z, Set<RelativeMovement>, Yaw, Pitch)
-                        serverPlayer.teleportTo(
-                                (ServerLevel) serverPlayer.level(),
-                                targetX,
-                                targetY,
-                                targetZ,
-                                java.util.Set.of(), // Forces absolute position coordinate changes
-                                serverPlayer.getYRot(),
-                                serverPlayer.getXRot()
-                        );
-                    }
-                }
+                leashedPlayer.hurtMarked = true;
             }
+        } else {
+            STUCK_TICKS.remove(leashedPlayer.getUUID());
         }
     }
 
     @SubscribeEvent
     public static void onStartTrackingPlayer(PlayerEvent.StartTracking event) {
-        // When a player client enters rendering range of the leashed player, send them the rope data
-        ErisKinkStuff.LOGGER.info("onStartPlayerTracking() Test");
+        // When a third-party observer begins tracking/rendering the leashed player
         if (event.getTarget() instanceof Player targetPlayer) {
             if (LEASHED_PLAYERS.containsKey(targetPlayer.getUUID())) {
                 java.util.UUID holderUUID = LEASHED_PLAYERS.get(targetPlayer.getUUID());
 
-                if (event.getEntity() instanceof ServerPlayer looker) {
-                    // Synchronise the visual data to the specific looking player client
-                    looker.connection.send(new LeashSyncPacket(targetPlayer.getUUID(), holderUUID));
+                // Extract the player who is doing the looking
+                if (event.getEntity() instanceof ServerPlayer observerPlayer) {
+                    // Directly force-feed the leash coordinates to the observer's client network pipeline
+                    observerPlayer.connection.send(new LeashSyncPacket(targetPlayer.getUUID(), holderUUID));
                 }
             }
         }
@@ -170,33 +218,32 @@ public class PlayerLeashEvents {
 
         LeashSyncPacket packet = new LeashSyncPacket(targetUUID, holderUUID);
 
-        // 1. Send data to all nearby observers looking at them
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayersTrackingEntity(target, packet);
+        // MODERN 1.21.1 NETWORKING: Broadcasts to the target player AND every single client
+        // that is currently within visual chunk tracking range of them.
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, packet);
 
-        // 2. Explicitly send the packet to the leashed target player client
-        if (target instanceof ServerPlayer serverTarget) {
-            serverTarget.connection.send(packet);
-        }
-
-        // 3. Explicitly send the packet to the holder player client
-        if (holder instanceof ServerPlayer serverHolder) {
+        // Also explicitly notify the holder just in case they are outside standard tracking boundaries
+        if (holder instanceof net.minecraft.server.level.ServerPlayer serverHolder) {
             serverHolder.connection.send(packet);
         }
+        ErisKinkStuff.LOGGER.info("Leash map synchronized to tracking matrix!");
     }
 
     public static void releaseLeash(Player player, boolean dropItem) {
         java.util.UUID removed = LEASHED_PLAYERS.remove(player.getUUID());
         LeashSyncPacket emptyPacket = new LeashSyncPacket(player.getUUID(), null);
 
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayersTrackingEntity(player, emptyPacket);
-
-        if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.connection.send(emptyPacket);
-        }
+        // Wipe visual maps for everyone tracking the entity
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, emptyPacket);
 
         if (removed != null && dropItem && !player.level().isClientSide()) {
             player.drop(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LEAD), false);
         }
+    }
+
+    private static boolean isLeashed(Player player) {
+        if (player == null) return false;
+        return LEASHED_PLAYERS.containsKey(player.getUUID());
     }
 
     private static boolean isWearingCollar(Player player) {

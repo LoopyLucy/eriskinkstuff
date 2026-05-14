@@ -2,6 +2,7 @@ package co.uk.loopylucy.kinkstuff;
 
 import co.uk.loopylucy.kinkstuff.client.*;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
+import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
 import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.minecraft.client.Minecraft;
@@ -55,6 +56,14 @@ public class ErisKinkStuffClient {
             }
             return -1;
         }, ModItems.MITTENS.get());
+
+        event.register((itemStack, tintIndex) -> {
+            if (itemStack.getItem() instanceof ClickerItem collar && tintIndex == 0) {
+                int colour = collar.getColor(itemStack);
+                return (colour == 0xFFFFFF) ? 0xFFFFFFFF : (0xFF000000 | colour);
+            }
+            return -1;
+        }, ModItems.CLICKER.get());
 
         ErisKinkStuff.LOGGER.info("Colour Handler Registered!");
     }

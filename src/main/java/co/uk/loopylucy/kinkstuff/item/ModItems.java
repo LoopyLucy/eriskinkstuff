@@ -1,6 +1,7 @@
 package co.uk.loopylucy.kinkstuff.item;
 
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
+import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
 import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.neoforged.bus.api.IEventBus;
@@ -12,6 +13,7 @@ public class ModItems {
 
     public static final DeferredItem<CollarItem> COLLAR = ITEMS.register("collar", CollarItem::new);
     public static final DeferredItem<MittensItem> MITTENS = ITEMS.register("mittens", MittensItem::new);
+    public static final DeferredItem<ClickerItem> CLICKER = ITEMS.register("clicker", ClickerItem::new);
 
     public static void register(IEventBus eventBus) { ITEMS.register(eventBus); }
 }
