@@ -1,9 +1,13 @@
 {
     "itemGroup.eriskinkstuff": "Eri's Kink Stuff!",
+    "creativetab.eriskinkstuff.tab": "Eri's Kink Stuff",
 
     "item.eriskinkstuff.collar": "Collar",
     "item.eriskinkstuff.mittens": "Mittens",
     "item.eriskinkstuff.clicker": "Clicker",
+    "item.eriskinkstuff.pet_bed": "Pet Bed",
+
+    "block.eriskinkstuff.pet_bed": "Pet Bed",
 
     "eriskinkstuff.configuration.title": "Eri's Kink Stuff! Configs",
     "eriskinkstuff.configuration.section.eriskinkstuff.common.toml": "Eri's Kink Stuff! Configs",
