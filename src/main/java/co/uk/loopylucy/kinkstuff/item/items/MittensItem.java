@@ -8,6 +8,11 @@ import net.minecraft.world.item.component.DyedItemColor;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+/**
+ * The Mittens curio item.
+ * While worn, this item prevents the player from holding anything in their hands.
+ * It automatically moves items from the hotbar/offhand into the main inventory or drops them.
+ */
 public class MittensItem extends Item implements ICurioItem {
 
     public MittensItem() {
@@ -17,43 +22,65 @@ public class MittensItem extends Item implements ICurioItem {
         );
     }
 
+    /** Gets the dye color of the mittens. */
     public int getColor(ItemStack stack) {
         DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);
         return dyedItemColor != null ? dyedItemColor.rgb() : 0xFFFFFFFF;
     }
 
+    /**
+     * Periodic tick event for when the item is equipped as a Curio.
+     * Enforces the "empty hands" constraint by moving items out of hands.
+     */
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         if (slotContext == null || stack.isEmpty() || slotContext.entity() == null) {
             return;
         }
 
+        // Only handle logic on the server to ensure inventory changes are authoritative
         if (slotContext.entity() instanceof Player player && !player.level().isClientSide()) {
             int selectedSlot = player.getInventory().selected;
 
+            // 1. CHECK MAIN HAND
             ItemStack mainHand = player.getMainHandItem();
             if (!mainHand.isEmpty()) {
                 ItemStack itemToMove = mainHand.copy();
 
+                // Clear the hand first
                 player.getInventory().setItem(selectedSlot, ItemStack.EMPTY);
 
+                // Attempt to move it to a safe inventory slot
                 moveItemSafely(player, itemToMove, selectedSlot);
                 player.inventoryMenu.broadcastChanges();
             }
 
+            // 2. CHECK OFFHAND
             ItemStack offHand = player.getOffhandItem();
             if (!offHand.isEmpty()) {
                 ItemStack itemToMove = offHand.copy();
 
+                // Clear the offhand (slot 40 in standard player inventory)
                 player.getInventory().setItem(40, ItemStack.EMPTY);
 
+                // Attempt to move it to a safe inventory slot
                 moveItemSafely(player, itemToMove, selectedSlot);
                 player.inventoryMenu.broadcastChanges();
             }
         }
     }
 
+    /**
+     * Attempts to move an item from the hands into the main inventory, 
+     * avoiding the currently active hotbar slot. If the inventory is full, 
+     * the item is dropped on the ground.
+     * 
+     * @param player The player whose inventory is being managed.
+     * @param stack The item stack to move.
+     * @param activeHotbarSlot The currently selected hotbar slot to avoid.
+     */
     private static void moveItemSafely(Player player, ItemStack stack, int activeHotbarSlot) {
+        // First pass: Try to stack with existing items in the main inventory (excluding the active slot)
         for (int i = 0; i < 36; i++) {
             if (i == activeHotbarSlot) continue;
 
@@ -71,6 +98,7 @@ public class MittensItem extends Item implements ICurioItem {
             if (stack.isEmpty()) return;
         }
 
+        // Second pass: Try to find an empty slot in the hotbar (excluding the active slot)
         for (int i = 0; i < 9; i++) {
             if (i == activeHotbarSlot) continue;
             if (player.getInventory().getItem(i).isEmpty()) {
@@ -80,6 +108,7 @@ public class MittensItem extends Item implements ICurioItem {
             }
         }
 
+        // Third pass: Try to find an empty slot in the main inventory
         for (int i = 9; i < 36; i++) {
             if (player.getInventory().getItem(i).isEmpty()) {
                 player.getInventory().setItem(i, stack.copy());
@@ -88,6 +117,7 @@ public class MittensItem extends Item implements ICurioItem {
             }
         }
 
+        // Final fallback: If no space was found, drop the item at the player's feet
         if (!stack.isEmpty()) {
             player.drop(stack, false);
         }

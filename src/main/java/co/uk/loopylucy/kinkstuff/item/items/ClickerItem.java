@@ -22,6 +22,11 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.List;
 
+/**
+ * The Clicker item.
+ * When used, it plays a sound and forces all nearby players wearing a collar 
+ * to look directly at the user.
+ */
 public class ClickerItem extends Item {
 
     public ClickerItem() {
@@ -31,11 +36,21 @@ public class ClickerItem extends Item {
         );
     }
 
+    /**
+     * Gets the dye color of the clicker.
+     * 
+     * @param stack The clicker ItemStack.
+     * @return The packed RGB integer color.
+     */
     public int getColor(ItemStack stack) {
         DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);
         return dyedItemColor != null ? dyedItemColor.rgb() : 0xFFFFFFFF;
     }
 
+    /**
+     * Handles the item use interaction.
+     * Plays audio and triggers the look-at logic on the server.
+     */
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player user, @NotNull InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
@@ -43,6 +58,7 @@ public class ClickerItem extends Item {
         if (!level.isClientSide()) {
             BlockPos pos = user.blockPosition();
 
+            // 1. PLAY GLOBAL AUDIO PACKET
             level.playSound(
                     null,
                     user.getX(),
@@ -54,19 +70,25 @@ public class ClickerItem extends Item {
                     1.0F
             );
 
+            // 2. SCAN FOR COLLARED TARGETS WITHIN 30 BLOCKS
             AABB searchBox = new AABB(pos).inflate(30.0D);
             List<Player> nearbyPlayers = level.getEntitiesOfClass(Player.class, searchBox);
 
             for (Player target : nearbyPlayers) {
+                // Skip the user themselves
                 if (target != user && isWearingCollar(target)) {
 
                     if (target instanceof ServerPlayer serverTarget) {
+                        // 3. FORCE CLIENT CAMERA LOOK LOCK
+                        // Sends a packet to the target client to rotate their camera towards the user's eyes
                         serverTarget.connection.send(new ClientboundPlayerLookAtPacket(
                                 EntityAnchorArgument.Anchor.EYES,
                                 user,
                                 EntityAnchorArgument.Anchor.EYES
                         ));
 
+                        // 4. SERVER-SIDE ROTATION SYNCHRONIZATION
+                        // Calculate background vectors to update server tracking fields instantly
                         double dx = user.getX() - target.getX();
                         double dy = (user.getY() + user.getEyeHeight() * 0.5D) - (target.getY() + target.getEyeHeight());
                         double dz = user.getZ() - target.getZ();
@@ -78,6 +100,7 @@ public class ClickerItem extends Item {
                         targetYaw = Mth.wrapDegrees(targetYaw);
                         targetPitch = Mth.clamp(targetPitch, -90F, 90F);
 
+                        // Enforce immediate runtime field alignment to prevent glitched rotations for other observers
                         serverTarget.setYRot(targetYaw);
                         serverTarget.setXRot(targetPitch);
                         serverTarget.setYHeadRot(targetYaw);
@@ -92,6 +115,7 @@ public class ClickerItem extends Item {
         return InteractionResultHolder.success(stack);
     }
 
+    /** Checks if a player is wearing a Collar via the Curios API. */
     private static boolean isWearingCollar(Player player) {
         if (player == null) return false;
         var invOpt = CuriosApi.getCuriosInventory(player);

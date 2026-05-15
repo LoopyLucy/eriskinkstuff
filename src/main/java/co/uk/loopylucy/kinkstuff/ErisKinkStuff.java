@@ -33,30 +33,39 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 
+/**
+ * The main mod class for Eri's Kink Stuff.
+ * This class handles the initialization of the mod, registration of all modded objects
+ * (items, blocks, sounds, etc.), and sets up capabilities and networking.
+ */
 @Mod(ErisKinkStuff.MODID)
 public class ErisKinkStuff {
     public static final String MODID = "eriskinkstuff";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public ErisKinkStuff(IEventBus modEventBus, ModContainer modContainer) {
+        // Register lifecycle and setup listeners
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerPackets);
         modEventBus.addListener(this::registerBlockColors);
         modEventBus.addListener(this::registerItemColors);
 
+        // Register all modded content
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModSounds.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
-
         ModCreativeTabs.register(modEventBus);
 
+        // Register the mod instance to the main NeoForge event bus
         NeoForge.EVENT_BUS.register(this);
 
+        // Setup configuration
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
+        // Client-only setup for config screens
         if (FMLEnvironment.dist == Dist.CLIENT) {
             modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
@@ -66,12 +75,19 @@ public class ErisKinkStuff {
         LOGGER.info("Common Loaded!");
     }
 
+    /**
+     * Registers custom capabilities for modded items.
+     * Currently used to integrate with the Curios API.
+     */
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.COLLAR.get());
         event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.MITTENS.get());
         LOGGER.info("Capabilities Registered!");
     }
 
+    /**
+     * Registers network packets for client-server communication.
+     */
     private void registerPackets(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(MODID);
 
@@ -80,9 +96,13 @@ public class ErisKinkStuff {
         LOGGER.info("Packets Registered!");
     }
 
+    /**
+     * Handles block color registration for dyeable blocks like the Pet Bed.
+     */
     private void registerBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register((state, level, pos, tintIndex) -> {
             if (level != null && pos != null) {
+                // Logic to resolve the 'origin' position of a multi-block Pet Bed
                 net.minecraft.core.Direction facing = state.getValue(PetBedBlock.FACING);
                 int x = state.getValue(PetBedBlock.X_PART);
                 int z = state.getValue(PetBedBlock.Z_PART);
@@ -97,6 +117,7 @@ public class ErisKinkStuff {
 
                 net.minecraft.core.BlockPos originPos = pos.subtract(gridShift);
 
+                // Fetch the custom color from the BlockEntity
                 if (level.getBlockEntity(originPos) instanceof PetBedBlockEntity bedBE) {
                     return bedBE.getCustomColour();
                 }
@@ -105,7 +126,9 @@ public class ErisKinkStuff {
         }, ModBlocks.PET_BED.get());
     }
 
-
+    /**
+     * Handles item color registration for dyeable items.
+     */
     private void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> {
             if (tintIndex == 0) {
@@ -120,5 +143,4 @@ public class ErisKinkStuff {
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("Server Loaded!");
     }
-
 }

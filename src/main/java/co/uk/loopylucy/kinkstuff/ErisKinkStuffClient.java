@@ -15,13 +15,22 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
+/**
+ * The main client-side mod class.
+ * Handles the registration of renderers, models, and color handlers that are only 
+ * relevant on the logical client.
+ */
 @Mod(value = ErisKinkStuff.MODID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = ErisKinkStuff.MODID, value = Dist.CLIENT)
 public class ErisKinkStuffClient {
 
+    /**
+     * Handles client-side initialization, such as registering Curios renderers.
+     */
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork( () -> {
+            // Register renderers for items that appear on the player model
             CuriosRendererRegistry.register(ModItems.COLLAR.get(), () -> new CollarRenderer(
                     new CollarModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModModelLayers.COLLAR))
             ));
@@ -32,6 +41,9 @@ public class ErisKinkStuffClient {
         ErisKinkStuff.LOGGER.info("Client Loaded and Renderer Registered!");
     }
 
+    /**
+     * Initializes static model references for use in custom rendering logic.
+     */
     @SubscribeEvent
     public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
         ClientAccess.MITTENS_MODEL = new MittensModel(
@@ -39,9 +51,14 @@ public class ErisKinkStuffClient {
         );
     }
 
+    /**
+     * Registers color handlers for dyeable items on the client.
+     */
     @SubscribeEvent
     public static void onItemColorHandler(RegisterColorHandlersEvent.Item event) {
         ErisKinkStuff.LOGGER.info("Colour Handler Started!");
+        
+        // Collar color handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof CollarItem collar && tintIndex == 0) {
                 int colour = collar.getColor(itemStack);
@@ -50,6 +67,7 @@ public class ErisKinkStuffClient {
             return -1;
         }, ModItems.COLLAR.get());
 
+        // Mittens color handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof MittensItem mittens && tintIndex == 0) {
                 int colour = mittens.getColor(itemStack);
@@ -58,6 +76,7 @@ public class ErisKinkStuffClient {
             return -1;
         }, ModItems.MITTENS.get());
 
+        // Clicker color handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof ClickerItem collar && tintIndex == 0) {
                 int colour = collar.getColor(itemStack);
@@ -69,6 +88,9 @@ public class ErisKinkStuffClient {
         ErisKinkStuff.LOGGER.info("Colour Handler Registered!");
     }
 
+    /**
+     * Registers custom model layer definitions.
+     */
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ModModelLayers.COLLAR, CollarModel::createLayer);

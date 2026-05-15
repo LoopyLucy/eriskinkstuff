@@ -4,10 +4,14 @@ import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Registry for custom model layer locations.
+ * These identifiers are used to link model parts with their baked geometry 
+ * during the layer registration process.
+ */
 public class ModModelLayers {
-    public static final ModelLayerLocation COLLAR = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "collar"), "main");
-
-    public static final ModelLayerLocation MITTENS = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "mittens"), "main");
+    /** Layer location for the Collar model. */
+    public static final ModelLayerLocation COLLAR = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "collar"), "main");
+    /** Layer location for the Mittens model. */
+    public static final ModelLayerLocation MITTENS = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "mittens"), "main");
 }

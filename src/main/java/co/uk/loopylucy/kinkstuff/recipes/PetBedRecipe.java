@@ -21,11 +21,24 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A custom crafting recipe for the Pet Bed.
+ * It requires three items in a horizontal row: [Wool] [Carpet] [Wool].
+ * The resulting Pet Bed will have a color blended from the input wool and carpet colors.
+ */
 public class PetBedRecipe extends CustomRecipe {
     public PetBedRecipe(CraftingBookCategory category) {
         super(category);
     }
 
+    /**
+     * Checks if the crafting grid contains exactly three items in a row: 
+     * two wool blocks flanking a carpet block.
+     * 
+     * @param input The crafting grid input.
+     * @param level The current world level.
+     * @return true if the pattern matches, false otherwise.
+     */
     @Override
     public boolean matches(CraftingInput input, @NotNull Level level) {
         // Enforce the layout pattern: exactly 3 items in a horizontal row (Wool, Carpet, Wool)
@@ -53,11 +66,18 @@ public class PetBedRecipe extends CustomRecipe {
         return isWoolBlock(slot0) && isCarpetBlock(slot1) && isWoolBlock(slot2);
     }
 
+    /**
+     * Assembles the resulting Pet Bed item with a blended color.
+     * 
+     * @param input The crafting grid input.
+     * @param registries Registry access for handling components.
+     * @return A new Pet Bed ItemStack with the blended color applied.
+     */
     @Override
     public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.@NotNull Provider registries) {
         List<DyeColor> colorsFound = new ArrayList<>();
 
-        // Gather all dye color profiles from the wool ingredients inside the active grid grid
+        // Gather all dye color profiles from the wool ingredients inside the active grid
         for (int i = 0; i < input.size(); i++) {
             ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
@@ -72,7 +92,7 @@ public class PetBedRecipe extends CustomRecipe {
         ItemStack result = new ItemStack(ModItems.PET_BED.get());
 
         if (!colorsFound.isEmpty()) {
-            // Fixes the array subscript assignment error
+            // Blending logic: averages the RGB components and scales based on brightness
             int[] rbgComponents = new int[3];
             int maxColorValue = 0;
             int totalColors = 0;
@@ -87,7 +107,7 @@ public class PetBedRecipe extends CustomRecipe {
                 int b = rgbHex & 0xFF;
 
                 maxColorValue += Math.max(r, Math.max(g, b));
-                rbgComponents[0] += r; // Added missing array index brackets
+                rbgComponents[0] += r; 
                 rbgComponents[1] += g;
                 rbgComponents[2] += b;
                 totalColors++;
@@ -103,6 +123,14 @@ public class PetBedRecipe extends CustomRecipe {
         return result;
     }
 
+    /**
+     * Internal helper to calculate the final blended hex color.
+     * 
+     * @param rbgComponents Summed RGB values.
+     * @param totalColors Number of colors being blended.
+     * @param maxColorValue Summed maximum channel values for brightness scaling.
+     * @return The resulting packed RGB integer.
+     */
     private static int getFinalHexColor(int[] rbgComponents, int totalColors, float maxColorValue) {
         int blendedR = rbgComponents[0] / totalColors;
         int blendedG = rbgComponents[1] / totalColors;
@@ -131,17 +159,21 @@ public class PetBedRecipe extends CustomRecipe {
     }
 
     // --- Internal Helpers ---
+    
+    /** Checks if an item represents a vanilla Wool block. */
     private boolean isWoolBlock(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return false;
         // Identifies vanilla wool blocks cleanly by checking their registry identifier pathway strings
         return BuiltInRegistries.BLOCK.getKey(blockItem.getBlock()).getPath().endsWith("_wool");
     }
 
+    /** Checks if an item represents a vanilla Carpet block. */
     private boolean isCarpetBlock(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return false;
         return blockItem.getBlock() instanceof WoolCarpetBlock;
     }
 
+    /** Extracts the DyeColor associated with a wool or carpet block. */
     private @org.jetbrains.annotations.Nullable DyeColor getBlockDyeColor(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return null;
         Block block = blockItem.getBlock();
