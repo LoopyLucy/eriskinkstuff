@@ -23,7 +23,7 @@ public class ModItems {
     public static final DeferredItem<Item> PET_BED = ITEMS.register("pet_bed",
             () -> new BlockItem(ModBlocks.PET_BED.get(), new Item.Properties()
                     .stacksTo(1)
-                    .component(DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0xFFFFFF, true))
+                    .component(DataComponents.DYED_COLOR, new net.minecraft.world.item.component.DyedItemColor(0xFFFFFF, false))
             )
     );
 

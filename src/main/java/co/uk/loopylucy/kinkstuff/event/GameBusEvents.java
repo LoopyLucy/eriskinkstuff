@@ -18,8 +18,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -49,22 +47,17 @@ public class GameBusEvents {
     }
 
     @SubscribeEvent
-    public static void onClientRightClick(PlayerInteractEvent.RightClickItem event) {
+    public static void onClientRightClick(PlayerInteractEvent.EntityInteract event) {
         if (!event.getLevel().isClientSide()) return;
 
-        ItemStack heldItem = event.getItemStack();
-        if (heldItem.is(Items.LEAD) || (heldItem.isEmpty() && event.getHand() == InteractionHand.MAIN_HAND)) {
-
-            HitResult hitResult = Minecraft.getInstance().hitResult;
-            if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
-                EntityHitResult entityHit = (EntityHitResult) hitResult;
-
-                if (entityHit.getEntity() instanceof Player targetPlayer) {
-                    PacketDistributor.sendToServer(new LeashServerPacket(targetPlayer.getUUID()));
-
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    event.setCanceled(true);
-                }
+        if (event.getTarget() instanceof Player targetPlayer) {
+            ItemStack heldItem = event.getItemStack();
+            
+            // Check if leashing or unleashing
+            if (heldItem.is(Items.LEAD) || (heldItem.isEmpty() && event.getHand() == InteractionHand.MAIN_HAND)) {
+                PacketDistributor.sendToServer(new LeashServerPacket(targetPlayer.getUUID(), event.getHand()));
+                event.setCancellationResult(InteractionResult.SUCCESS);
+                event.setCanceled(true);
             }
         }
     }

@@ -11,11 +11,9 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -28,41 +26,40 @@ import java.util.*;
 public class PlayerLeashEvents {
 
     private static final Map<UUID, UUID> LEASHED_PLAYERS = new HashMap<>();
+    private static final Map<UUID, Integer> STUCK_TICKS = new HashMap<>();
 
-    @SubscribeEvent
-    public static void onPlayerInteractEntity(PlayerInteractEvent.EntityInteract event) {
-        Player holder = event.getEntity();
-
+    public static void handleServerLeashLogic(Player holder, Player targetPlayer, net.minecraft.world.InteractionHand hand) {
+        if (holder == null || targetPlayer == null || holder == targetPlayer) return;
         if (holder.level().isClientSide()) return;
 
-        if (event.getTarget() instanceof Player targetPlayer) {
-            ItemStack heldItem = event.getItemStack();
+        ErisKinkStuff.LOGGER.info("Leash logic triggered: holder={}, target={}, hand={}", holder.getName().getString(), targetPlayer.getName().getString(), hand);
 
-            if (isWearingCollar(targetPlayer)) {
-                boolean alreadyLeashed = LEASHED_PLAYERS.containsKey(targetPlayer.getUUID());
+        if (isWearingCollar(targetPlayer)) {
+            boolean alreadyLeashed = LEASHED_PLAYERS.containsKey(targetPlayer.getUUID());
+            ItemStack heldItem = holder.getItemInHand(hand);
 
-                if (heldItem.is(Items.LEAD) && !alreadyLeashed) {
+            if (heldItem.is(Items.LEAD)) {
+                if (!alreadyLeashed) {
                     attachLeash(holder, targetPlayer);
-
                     if (!holder.getAbilities().instabuild) {
                         heldItem.shrink(1);
                     }
-
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                    event.setCanceled(true);
-                }
-                else if (heldItem.isEmpty() && event.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND && alreadyLeashed) {
-                    if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
-                        releaseLeash(targetPlayer, true);
-                        event.setCancellationResult(InteractionResult.SUCCESS);
-                        event.setCanceled(true);
-                    }
+                    ErisKinkStuff.LOGGER.info("Leash successfully attached to " + targetPlayer.getName().getString());
+                } else if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
+                    releaseLeash(targetPlayer, true);
+                    ErisKinkStuff.LOGGER.info("Leash successfully released from " + targetPlayer.getName().getString() + " using lead.");
                 }
             }
+            else if (heldItem.isEmpty() && alreadyLeashed) {
+                if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
+                    releaseLeash(targetPlayer, true);
+                    ErisKinkStuff.LOGGER.info("Leash successfully released from " + targetPlayer.getName().getString());
+                }
+            }
+        } else {
+            ErisKinkStuff.LOGGER.info("Target {} is not wearing a collar, ignoring leash interaction.", targetPlayer.getName().getString());
         }
     }
-
-    private static final Map<UUID, Integer> STUCK_TICKS = new HashMap<>();
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
@@ -192,19 +189,21 @@ public class PlayerLeashEvents {
 
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, packet);
 
-        if (holder instanceof net.minecraft.server.level.ServerPlayer serverHolder) {
-            serverHolder.connection.send(packet);
+        if (holder instanceof ServerPlayer serverHolder) {
+            PacketDistributor.sendToPlayer(serverHolder, packet);
         }
         ErisKinkStuff.LOGGER.info("Leash map synchronized to tracking matrix!");
     }
 
     public static void releaseLeash(Player player, boolean dropItem) {
         java.util.UUID removed = LEASHED_PLAYERS.remove(player.getUUID());
+        if (removed == null) return;
+        
         LeashSyncPacket emptyPacket = new LeashSyncPacket(player.getUUID(), null);
 
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, emptyPacket);
 
-        if (removed != null && dropItem && !player.level().isClientSide()) {
+        if (dropItem && !player.level().isClientSide()) {
             player.drop(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.LEAD), false);
         }
     }
@@ -217,26 +216,5 @@ public class PlayerLeashEvents {
     private static boolean isWearingCollar(Player player) {
         var invOpt = CuriosApi.getCuriosInventory(player);
         return invOpt.isPresent() && invOpt.get().findFirstCurio(ModItems.COLLAR.get()).isPresent();
-    }
-
-    public static void handleServerLeashLogic(Player holder, Player targetPlayer) {
-        if (isWearingCollar(targetPlayer)) {
-            boolean alreadyLeashed = LEASHED_PLAYERS.containsKey(targetPlayer.getUUID());
-            ItemStack heldItem = holder.getMainHandItem();
-
-            if (heldItem.is(Items.LEAD) && !alreadyLeashed) {
-                attachLeash(holder, targetPlayer);
-                if (!holder.getAbilities().instabuild) {
-                    heldItem.shrink(1);
-                }
-                ErisKinkStuff.LOGGER.info("Leash successfully attached to " + targetPlayer.getName().getString());
-            }
-            else if (heldItem.isEmpty() && alreadyLeashed) {
-                if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
-                    releaseLeash(targetPlayer, true);
-                    ErisKinkStuff.LOGGER.info("Leash successfully released from " + targetPlayer.getName().getString());
-                }
-            }
-        }
     }
 }

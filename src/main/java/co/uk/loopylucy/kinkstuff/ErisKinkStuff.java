@@ -5,6 +5,7 @@ import co.uk.loopylucy.kinkstuff.block.blocks.PetBedBlock;
 import co.uk.loopylucy.kinkstuff.block.entity.PetBedBlockEntity;
 import co.uk.loopylucy.kinkstuff.init.ModBlockEntities;
 import co.uk.loopylucy.kinkstuff.init.ModCreativeTabs;
+import co.uk.loopylucy.kinkstuff.init.ModRecipes;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashServerPacket;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
@@ -48,6 +49,7 @@ public class ErisKinkStuff {
         ModBlocks.register(modEventBus);
         ModSounds.register(modEventBus);
         ModBlockEntities.register(modEventBus);
+        ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
 
         ModCreativeTabs.register(modEventBus);
 
