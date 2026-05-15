@@ -30,9 +30,6 @@ public record LeashSyncPacket(UUID target, UUID holder) implements CustomPacketP
     public @NotNull Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public static void handle(final LeashSyncPacket payload, final IPayloadContext context) {
-        context.enqueueWork(() -> {
-            // Updates the client map memory storage cleanly on the render thread
-            ClientLeashTracker.update(payload.target(), payload.holder());
-        });
+        context.enqueueWork(() -> ClientLeashTracker.update(payload.target(), payload.holder()));
     }
 }

@@ -20,7 +20,6 @@ public class CollarModel extends HumanoidModel<LivingEntity> {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        // Empty base parts
         partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
         partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
         PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.ZERO);
@@ -29,10 +28,7 @@ public class CollarModel extends HumanoidModel<LivingEntity> {
         partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create(), PartPose.ZERO);
         partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.ZERO);
 
-        // A proper hollow ring made of 4 sides
-        // It hangs lower (Y=1.5) and is tilted forward to look like a necklace
         body.addOrReplaceChild("collar_ring", CubeListBuilder.create()
-                // originY = up/down, originX = left/right, originZ = front/back
                 .texOffs(0, 0).addBox(-2.5F, -0.1F, -2.5F, 5.0F, 1.0F, 1.0F) // Front
                 .texOffs(0, 2).addBox(-2.5F, -0.1F, 1.5F, 5.0F, 1.0F, 1.0F)  // Back
                 .texOffs(0, 10).addBox(-3.5F, -0.1F, -2.5F, 1.0F, 1.0F, 5.0F) // Left

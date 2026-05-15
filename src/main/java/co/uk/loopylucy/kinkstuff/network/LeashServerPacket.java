@@ -25,10 +25,8 @@ public record LeashServerPacket(UUID targetUUID) implements CustomPacketPayload 
     public static void handle(final LeashServerPacket payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer holder) {
-                // Find the targeted player entity on the server world
                 net.minecraft.world.entity.Entity targetEntity = holder.serverLevel().getEntities().get(payload.targetUUID());
                 if (targetEntity instanceof net.minecraft.world.entity.player.Player targetPlayer) {
-                    // Trigger the leash calculation mechanics
                     PlayerLeashEvents.handleServerLeashLogic(holder, targetPlayer);
                 }
             }

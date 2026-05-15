@@ -34,10 +34,7 @@ public class MittensModel extends HumanoidModel<LivingEntity> {
         PartDefinition left_arm = partdefinition.addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.ZERO);
         PartDefinition right_arm = partdefinition.addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.ZERO);
 
-        // A proper hollow ring made of 4 sides
-        // It hangs lower (Y=1.5) and is tilted forward to look like a necklace
         left_arm.addOrReplaceChild("left_mitten", CubeListBuilder.create()
-                // originY = up/down, originX = left/right, originZ = front/back
                 .texOffs(0, 11)
                 .addBox(-1.5F, 6.0F, -2.5F, 5.0F, 6.0F, 5.0F),
                 PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F));

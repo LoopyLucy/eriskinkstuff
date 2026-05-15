@@ -27,39 +27,31 @@ import java.util.*;
 @EventBusSubscriber(modid = ErisKinkStuff.MODID)
 public class PlayerLeashEvents {
 
-    // Maps: Leashed Player -> Leash Holder
     private static final Map<UUID, UUID> LEASHED_PLAYERS = new HashMap<>();
 
     @SubscribeEvent
     public static void onPlayerInteractEntity(PlayerInteractEvent.EntityInteract event) {
         Player holder = event.getEntity();
 
-        // 1. CRITICAL: Strictly process mechanics on the logical Server to update maps
         if (holder.level().isClientSide()) return;
 
-        // 2. Validate that the targeted object is a Player entity
         if (event.getTarget() instanceof Player targetPlayer) {
             ItemStack heldItem = event.getItemStack();
 
-            // 3. Verify they have your collar equipped in their Curios grid slot
             if (isWearingCollar(targetPlayer)) {
                 boolean alreadyLeashed = LEASHED_PLAYERS.containsKey(targetPlayer.getUUID());
 
-                // SCENARIO A: Right-clicking with a Lead to ATTACH the player
                 if (heldItem.is(Items.LEAD) && !alreadyLeashed) {
                     attachLeash(holder, targetPlayer);
 
                     if (!holder.getAbilities().instabuild) {
-                        heldItem.shrink(1); // Consume the item on the server registry
+                        heldItem.shrink(1);
                     }
 
-                    // Force Minecraft to cancel further vanilla screen processing loops
                     event.setCancellationResult(InteractionResult.SUCCESS);
                     event.setCanceled(true);
                 }
-                // SCENARIO B: Right-clicking with an Empty Hand to RELEASE the player
                 else if (heldItem.isEmpty() && event.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND && alreadyLeashed) {
-                    // Verify that only the tracking coordinator holding the rope can snap it
                     if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
                         releaseLeash(targetPlayer, true);
                         event.setCancellationResult(InteractionResult.SUCCESS);
@@ -70,14 +62,12 @@ public class PlayerLeashEvents {
         }
     }
 
-    // Inside PlayerLeashEvents.java:
-    // Helper map to track how many consecutive ticks a player has been stuck far away
     private static final Map<UUID, Integer> STUCK_TICKS = new HashMap<>();
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player leashedPlayer = event.getEntity();
-        if (leashedPlayer.level().isClientSide()) return; // Server thread physics only
+        if (leashedPlayer.level().isClientSide()) return;
 
         if (isLeashed(leashedPlayer)) {
             if (!isWearingCollar(leashedPlayer)) {
@@ -96,13 +86,11 @@ public class PlayerLeashEvents {
 
                 double totalDistance = leashedPlayer.distanceTo(holder);
 
-                // 1. ISOLATE VECTOR DISTANCES
                 double dx = holder.getX() - leashedPlayer.getX();
                 double dy = (holder.getY() + holder.getEyeHeight() * 0.5D) - (leashedPlayer.getY() + leashedPlayer.getEyeHeight());
                 double dz = holder.getZ() - leashedPlayer.getZ();
                 double horizontalDistance = Mth.sqrt((float) (dx * dx + dz * dz));
 
-                // Track horizontal stuck loops for the fallback teleport
                 if (horizontalDistance > 8.0D) {
                     int ticksStuck = STUCK_TICKS.getOrDefault(leashedPlayer.getUUID(), 0) + 1;
                     STUCK_TICKS.put(leashedPlayer.getUUID(), ticksStuck);
@@ -119,51 +107,38 @@ public class PlayerLeashEvents {
                     STUCK_TICKS.put(leashedPlayer.getUUID(), 0);
                 }
 
-                // 2. CALCULATE ROTATIONAL LOOK ANGLES
                 float targetYaw = (float) (Mth.atan2(dz, dx) * (180D / Math.PI)) - 90F;
                 float targetPitch = (float) -(Mth.atan2(dy, horizontalDistance) * (180D / Math.PI));
                 targetYaw = Mth.wrapDegrees(targetYaw);
                 targetPitch = Mth.clamp(targetPitch, -90F, 90F);
 
-                // 3. ENFORCE PHYSICS VIA KNOCKBACK AND LOOK-LOCK PACKETS
                 if (leashedPlayer instanceof ServerPlayer serverPlayer) {
 
-                    // If they wander outside the 4-block slack threshold, apply knockback momentum
                     if (totalDistance > 4.0D) {
                         net.minecraft.world.phys.Vec3 direction = holder.position().subtract(leashedPlayer.position()).normalize();
 
-                        // Scale the knockback strength based on how far away they are being pulled
                         float pullStrength = (float) (totalDistance - 4.0D) * 0.15F;
-                        pullStrength = Mth.clamp(pullStrength, 0.2F, 0.8F); // Clamp to prevent extreme launching
+                        pullStrength = Mth.clamp(pullStrength, 0.2F, 0.8F);
 
-                        // Apply server-side knockback vector force
-                        // Arguments: strength, xRatio, zRatio
-                        // We invert the direction vectors so they are pulled TOWARD you rather than pushed away
                         serverPlayer.knockback(pullStrength, -direction.x, -direction.z);
 
-                        // Vertical assist: If you are significantly higher up, add an extra lift boost
                         if (holder.getY() > leashedPlayer.getY() + 0.5D) {
                             serverPlayer.setDeltaMovement(serverPlayer.getDeltaMovement().add(0.0D, 0.2D, 0.0D));
                         }
 
-                        // Immediately force an explicit velocity packet update to keep physics synchronized
                         serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
                     }
 
-                    // 4. FORCE THE LOOK-LOCK (Absolute Rotation)
-                    // We pass 0.0 for X, Y, Z because position movement is handled by the knockback physics loop.
-                    // Leaving X, Y, Z as relative means their position stays untouched by this packet, completely stopping glitches.
                     serverPlayer.connection.send(new ClientboundPlayerPositionPacket(
                             0.0D,
                             0.0D,
                             0.0D,
                             targetYaw,
                             targetPitch,
-                            Set.of(RelativeMovement.X, RelativeMovement.Y, RelativeMovement.Z), // Keep position relative (unmodified)
+                            Set.of(RelativeMovement.X, RelativeMovement.Y, RelativeMovement.Z),
                             0
                     ));
 
-                    // Instantly align internal orientation variables
                     serverPlayer.setYRot(targetYaw);
                     serverPlayer.setXRot(targetPitch);
                     serverPlayer.setYHeadRot(targetYaw);
@@ -178,14 +153,11 @@ public class PlayerLeashEvents {
 
     @SubscribeEvent
     public static void onStartTrackingPlayer(PlayerEvent.StartTracking event) {
-        // When a third-party observer begins tracking/rendering the leashed player
         if (event.getTarget() instanceof Player targetPlayer) {
             if (LEASHED_PLAYERS.containsKey(targetPlayer.getUUID())) {
                 java.util.UUID holderUUID = LEASHED_PLAYERS.get(targetPlayer.getUUID());
 
-                // Extract the player who is doing the looking
                 if (event.getEntity() instanceof ServerPlayer observerPlayer) {
-                    // Directly force-feed the leash coordinates to the observer's client network pipeline
                     observerPlayer.connection.send(new LeashSyncPacket(targetPlayer.getUUID(), holderUUID));
                 }
             }
@@ -218,11 +190,8 @@ public class PlayerLeashEvents {
 
         LeashSyncPacket packet = new LeashSyncPacket(targetUUID, holderUUID);
 
-        // MODERN 1.21.1 NETWORKING: Broadcasts to the target player AND every single client
-        // that is currently within visual chunk tracking range of them.
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, packet);
 
-        // Also explicitly notify the holder just in case they are outside standard tracking boundaries
         if (holder instanceof net.minecraft.server.level.ServerPlayer serverHolder) {
             serverHolder.connection.send(packet);
         }
@@ -233,7 +202,6 @@ public class PlayerLeashEvents {
         java.util.UUID removed = LEASHED_PLAYERS.remove(player.getUUID());
         LeashSyncPacket emptyPacket = new LeashSyncPacket(player.getUUID(), null);
 
-        // Wipe visual maps for everyone tracking the entity
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, emptyPacket);
 
         if (removed != null && dropItem && !player.level().isClientSide()) {
@@ -256,7 +224,6 @@ public class PlayerLeashEvents {
             boolean alreadyLeashed = LEASHED_PLAYERS.containsKey(targetPlayer.getUUID());
             ItemStack heldItem = holder.getMainHandItem();
 
-            // ATTACHMENT
             if (heldItem.is(Items.LEAD) && !alreadyLeashed) {
                 attachLeash(holder, targetPlayer);
                 if (!holder.getAbilities().instabuild) {
@@ -264,7 +231,6 @@ public class PlayerLeashEvents {
                 }
                 ErisKinkStuff.LOGGER.info("Leash successfully attached to " + targetPlayer.getName().getString());
             }
-            // RELEASE
             else if (heldItem.isEmpty() && alreadyLeashed) {
                 if (LEASHED_PLAYERS.get(targetPlayer.getUUID()).equals(holder.getUUID())) {
                     releaseLeash(targetPlayer, true);

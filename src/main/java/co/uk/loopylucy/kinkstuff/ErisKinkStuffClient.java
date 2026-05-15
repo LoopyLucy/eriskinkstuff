@@ -1,15 +1,11 @@
 package co.uk.loopylucy.kinkstuff;
 
-import co.uk.loopylucy.kinkstuff.block.ModBlocks;
-import co.uk.loopylucy.kinkstuff.block.entity.PetBedBlockEntity;
 import co.uk.loopylucy.kinkstuff.client.*;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
 import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.DyedItemColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

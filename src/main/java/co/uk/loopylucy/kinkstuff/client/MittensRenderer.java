@@ -40,7 +40,6 @@ public class MittensRenderer implements ICurioRenderer {
             float headPitch) {
 
         if (renderLayerParent.getModel() instanceof HumanoidModel<?> humanoidModel) {
-            // Copy state from the entity model so animations match
             this.model.attackTime = humanoidModel.attackTime;
             this.model.riding = humanoidModel.riding;
             this.model.young = humanoidModel.young;
@@ -49,13 +48,10 @@ public class MittensRenderer implements ICurioRenderer {
             this.model.crouching = humanoidModel.crouching;
             this.model.body.visible = true;
 
-            //ErisKinkStuff.LOGGER.debug("CollarRenderer.render called for entity {}", slotContext.entity());
 
-            // 1. Setup the color
             int colour = ((MittensItem)stack.getItem()).getColor(stack);
             int finalARGB = 0xFF000000 | (colour & 0xFFFFFF);
 
-            // 2. Sync animations
             this.model.prepareMobModel(slotContext.entity(), limbSwing, limbSwingAmount, partialTicks);
             this.model.setupAnim(slotContext.entity(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 

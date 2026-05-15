@@ -2,16 +2,12 @@ package co.uk.loopylucy.kinkstuff.block;
 
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.block.blocks.PetBedBlock;
-import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
-import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
-import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModBlocks {

@@ -28,29 +28,23 @@ public class MittensItem extends Item implements ICurioItem {
             return;
         }
 
-        // 1. Get the entity and verify it is a player on the logical Server
         if (slotContext.entity() instanceof Player player && !player.level().isClientSide()) {
             int selectedSlot = player.getInventory().selected;
 
-            // 2. Process and clear Main Hand
             ItemStack mainHand = player.getMainHandItem();
             if (!mainHand.isEmpty()) {
                 ItemStack itemToMove = mainHand.copy();
 
-                // Clear the active hand slot immediately to avoid race conditions
                 player.getInventory().setItem(selectedSlot, ItemStack.EMPTY);
 
-                // Move item safely while avoiding the active hand slot
                 moveItemSafely(player, itemToMove, selectedSlot);
                 player.inventoryMenu.broadcastChanges();
             }
 
-            // 3. Process and clear Off Hand
             ItemStack offHand = player.getOffhandItem();
             if (!offHand.isEmpty()) {
                 ItemStack itemToMove = offHand.copy();
 
-                // Slot 40 is the hardcoded off-hand inventory index
                 player.getInventory().setItem(40, ItemStack.EMPTY);
 
                 moveItemSafely(player, itemToMove, selectedSlot);
@@ -59,10 +53,7 @@ public class MittensItem extends Item implements ICurioItem {
         }
     }
 
-    // THE FIXED MOVEMENT LOGIC: Stops item destruction and hand-flashing
-    // UPDATED MOVEMENT LOGIC: Prioritizes the hotbar line before using the backpack bag
     private static void moveItemSafely(Player player, ItemStack stack, int activeHotbarSlot) {
-        // Step A: Merge into existing matching stacks first (skipping the active hand slot)
         for (int i = 0; i < 36; i++) {
             if (i == activeHotbarSlot) continue;
 
@@ -80,9 +71,8 @@ public class MittensItem extends Item implements ICurioItem {
             if (stack.isEmpty()) return;
         }
 
-        // Step B: NOW RUNS FIRST - Put items into empty INACTIVE hotbar slots (0-8)
         for (int i = 0; i < 9; i++) {
-            if (i == activeHotbarSlot) continue; // Skip the active selection dead-zone
+            if (i == activeHotbarSlot) continue;
             if (player.getInventory().getItem(i).isEmpty()) {
                 player.getInventory().setItem(i, stack.copy());
                 stack.setCount(0);
@@ -90,7 +80,6 @@ public class MittensItem extends Item implements ICurioItem {
             }
         }
 
-        // Step C: NOW RUNS SECOND - Use empty main inventory backpack slots (9-35) if hotbar is full
         for (int i = 9; i < 36; i++) {
             if (player.getInventory().getItem(i).isEmpty()) {
                 player.getInventory().setItem(i, stack.copy());
@@ -99,7 +88,6 @@ public class MittensItem extends Item implements ICurioItem {
             }
         }
 
-        // Step D: Ground drop safety backup if inventory is entirely packed solid
         if (!stack.isEmpty()) {
             player.drop(stack, false);
         }

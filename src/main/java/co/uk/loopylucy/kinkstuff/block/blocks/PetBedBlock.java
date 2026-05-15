@@ -5,7 +5,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -56,11 +58,10 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    protected void tick(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
+    protected void tick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
         super.tick(state, level, pos, random);
 
         if (state.getValue(OCCUPIED)) {
-            // Verify if a sleeping player entity is still resting on this block coordinate
             boolean playerPresent = !level.getEntitiesOfClass(Player.class, new net.minecraft.world.phys.AABB(pos)).isEmpty();
             if (!playerPresent) {
                 level.setBlock(pos, state.setValue(OCCUPIED, false), 3);
@@ -69,12 +70,12 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public @NotNull Optional<ServerPlayer.RespawnPosAngle> getRespawnPosition(BlockState state, EntityType<?> type, LevelReader levelReader, BlockPos pos, float orientation) {
+    public @NotNull Optional<ServerPlayer.RespawnPosAngle> getRespawnPosition(@NotNull BlockState state, @NotNull EntityType<?> type, @NotNull LevelReader levelReader, BlockPos pos, float orientation) {
         Vec3 spawnBlock = new Vec3(pos.getX() + 0.5D, pos.getY() + 0.1875D, pos.getZ() + 0.5D);
         return Optional.of(ServerPlayer.RespawnPosAngle.of(
                 spawnBlock,
@@ -83,25 +84,24 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    public boolean isBed(BlockState state, BlockGetter level, BlockPos pos, @Nullable LivingEntity player) {
+    public boolean isBed(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @Nullable LivingEntity player) {
         return true;
     }
 
     @Override
-    public Direction getBedDirection(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos) {
+    public @NotNull Direction getBedDirection(BlockState state, net.minecraft.world.level.@NotNull LevelReader level, @NotNull BlockPos pos) {
         return state.getValue(FACING);
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         if (level.isClientSide) return InteractionResult.CONSUME;
 
-        // Explode if clicked in an invalid sleeping dimension (like the Nether)
         if (!level.dimensionType().natural()) {
             level.explode(null, pos.getX(), pos.getY(), pos.getZ(), 5.0F, Level.ExplosionInteraction.BLOCK);
             return InteractionResult.SUCCESS;
@@ -111,29 +111,23 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
         int currentX = state.getValue(X_PART);
         int currentZ = state.getValue(Z_PART);
 
-        // Find bottom-left grid origin (0,0) and locate the correct target pillow side block position
-        BlockPos baseOrigin = pos.subtract(translateGridOffset(BlockPos.ZERO, currentX, currentZ, facing));
-        BlockPos leftPillowPos = baseOrigin;
+        BlockPos leftPillowPos = pos.subtract(translateGridOffset(BlockPos.ZERO, currentX, currentZ, facing));
         BlockPos gridShift = translateGridOffset(BlockPos.ZERO, 1, 0, facing);
-        BlockPos rightPillowPos = baseOrigin.offset(gridShift.getX(), gridShift.getY(), gridShift.getZ());
+        BlockPos rightPillowPos = leftPillowPos.offset(gridShift.getX(), gridShift.getY(), gridShift.getZ());
 
         BlockPos targetPillowPos = (currentX == 0) ? leftPillowPos : rightPillowPos;
         BlockState targetPillowState = level.getBlockState(targetPillowPos);
 
         if (targetPillowState.getBlock() != this) return InteractionResult.FAIL;
 
-        // 1. DAYTIME SPAWN SETTING ENHANCEMENT
-        // If it is daytime, update the player's spawn point immediately without putting them to sleep
         if (!level.isNight() && !level.isThundering()) {
             if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-                // Sets the respawn position on the clicked side of the bed, keeping the angle looking direction intact
                 serverPlayer.setRespawnPosition(level.dimension(), targetPillowPos, player.getYRot(), false, true);
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("block.minecraft.bed.nospawn"), true);
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("block.minecraft.bed.no_sleep"), true);
             }
             return InteractionResult.SUCCESS;
         }
 
-        // 2. NIGHTTIME SLEEP ROUTINE (Existing verified loop)
         if (targetPillowState.getValue(OCCUPIED)) {
             player.displayClientMessage(net.minecraft.network.chat.Component.translatable("block.minecraft.bed.occupied"), true);
             return InteractionResult.SUCCESS;
@@ -174,7 +168,7 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (level.isClientSide) return;
 
@@ -199,7 +193,7 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    protected void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             if (!level.isClientSide()) {
                 Direction facing = state.getValue(FACING);
@@ -208,18 +202,14 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
 
                 BlockPos originPos = pos.subtract(translateGridOffset(BlockPos.ZERO, currentX, currentZ, facing));
 
-                BlockPos tl = originPos;
                 BlockPos tr = originPos.offset(translateGridOffset(BlockPos.ZERO, 1, 0, facing));
                 BlockPos bl = originPos.offset(translateGridOffset(BlockPos.ZERO, 0, 1, facing));
                 BlockPos br = originPos.offset(translateGridOffset(BlockPos.ZERO, 1, 1, facing));
 
-                // FIX: The master origin block (tl) MUST be allowed to drop its items (true)
-                // This guarantees the loot table executes and drops your pet bed item!
-                if (level.getBlockState(tl).is(this) && !tl.equals(pos)) {
-                    level.destroyBlock(tl, true);
+                if (level.getBlockState(originPos).is(this) && !originPos.equals(pos)) {
+                    level.destroyBlock(originPos, true);
                 }
 
-                // The other three blocks keep drops disabled (false) so they don't duplicate the item
                 if (level.getBlockState(tr).is(this) && !tr.equals(pos)) level.destroyBlock(tr, false);
                 if (level.getBlockState(bl).is(this) && !bl.equals(pos)) level.destroyBlock(bl, false);
                 if (level.getBlockState(br).is(this) && !br.equals(pos)) level.destroyBlock(br, false);
@@ -234,11 +224,10 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
+    protected @NotNull BlockState updateShape(BlockState state, @NotNull Direction direction, @NotNull BlockState neighborState, LevelAccessor level, BlockPos currentPos, @NotNull BlockPos neighborPos) {
         Direction facing = state.getValue(FACING);
         BlockPos originPos = currentPos.subtract(translateGridOffset(BlockPos.ZERO, state.getValue(X_PART), state.getValue(Z_PART), facing));
 
-        // Safety rail fallback loop
         if (level.getBlockState(originPos).getBlock() != this) {
             return Blocks.AIR.defaultBlockState();
         }
@@ -261,7 +250,7 @@ public class PetBedBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
         if (blockState.getValue(X_PART) == 0 && blockState.getValue(Z_PART) == 0) {
             return new PetBedBlockEntity(blockPos, blockState);
         }

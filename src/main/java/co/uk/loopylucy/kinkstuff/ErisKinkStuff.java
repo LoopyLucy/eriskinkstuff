@@ -5,17 +5,12 @@ import co.uk.loopylucy.kinkstuff.block.blocks.PetBedBlock;
 import co.uk.loopylucy.kinkstuff.block.entity.PetBedBlockEntity;
 import co.uk.loopylucy.kinkstuff.init.ModBlockEntities;
 import co.uk.loopylucy.kinkstuff.init.ModCreativeTabs;
-import co.uk.loopylucy.kinkstuff.init.ModDataComponents;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashServerPacket;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
 import co.uk.loopylucy.kinkstuff.sound.ModSounds;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.component.DyedItemColor;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -53,7 +48,6 @@ public class ErisKinkStuff {
         ModBlocks.register(modEventBus);
         ModSounds.register(modEventBus);
         ModBlockEntities.register(modEventBus);
-        ModDataComponents.DATA_COMPONENT_TYPES.register(modEventBus);
 
         ModCreativeTabs.register(modEventBus);
 
@@ -87,12 +81,10 @@ public class ErisKinkStuff {
     private void registerBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register((state, level, pos, tintIndex) -> {
             if (level != null && pos != null) {
-                // Read local properties for the specific piece Minecraft is trying to draw right now
                 net.minecraft.core.Direction facing = state.getValue(PetBedBlock.FACING);
                 int x = state.getValue(PetBedBlock.X_PART);
                 int z = state.getValue(PetBedBlock.Z_PART);
 
-                // Inline coordinate translator: Safely mimics your Java class matrix math
                 net.minecraft.core.BlockPos gridShift = switch (facing) {
                     case NORTH -> net.minecraft.core.BlockPos.ZERO.east(x).south(z);
                     case SOUTH -> net.minecraft.core.BlockPos.ZERO.west(x).north(z);
@@ -101,20 +93,17 @@ public class ErisKinkStuff {
                     default    -> net.minecraft.core.BlockPos.ZERO;
                 };
 
-                // Pinpoint exactly where the master data entity is located in the world
                 net.minecraft.core.BlockPos originPos = pos.subtract(gridShift);
 
-                // Pull the custom color from the master entity and apply it to this dummy piece
                 if (level.getBlockEntity(originPos) instanceof PetBedBlockEntity bedBE) {
                     return bedBE.getCustomColour();
                 }
             }
-            return -1; // Default fallback tint if no data is found
+            return -1;
         }, ModBlocks.PET_BED.get());
     }
 
 
-    // 2. INTEGRATED ITEM COLOR HANDLER: No extra classes needed!
     private void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> {
             if (tintIndex == 0) {
@@ -122,7 +111,7 @@ public class ErisKinkStuff {
                 return dyedColor != null ? dyedColor.rgb() : 0xFFFFFF;
             }
             return -1;
-        }, ModItems.PET_BED.get()); // Make sure this matches your exact key name in ModItems
+        }, ModItems.PET_BED.get());
     }
 
     @SubscribeEvent
