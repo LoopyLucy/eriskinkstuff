@@ -4,16 +4,20 @@ import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -106,6 +110,16 @@ public class PlayerLeashEvents {
                     return;
                 }
 
+                //Makes sure that the player cannot fly whilst leashed despite technically being allowed.
+                if(leashedPlayer instanceof ServerPlayer) {
+                    if (!leashedPlayer.isCreative() && !leashedPlayer.isSpectator()) {
+                        if (leashedPlayer.getAbilities().flying) {
+                            leashedPlayer.getAbilities().flying = false;
+                            leashedPlayer.onUpdateAbilities();
+                        }
+                    }
+                }
+
                 double totalDistance = leashedPlayer.distanceTo(holder);
 
                 // Calculate vectors for look-at and pull physics
@@ -196,7 +210,7 @@ public class PlayerLeashEvents {
     /** Automatically release leash when a player logs out. */
     @SubscribeEvent
     public static void onPlayerLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        releaseLeash(event.getEntity(), false);
+        releaseLeash(event.getEntity(), true);
     }
 
     /** Automatically release leash when a player dies. */
@@ -223,6 +237,19 @@ public class PlayerLeashEvents {
         java.util.UUID holderUUID = holder.getUUID();
         LEASHED_PLAYERS.put(targetUUID, holderUUID);
 
+        //Bypass "flying" kick while leashed
+        if (target instanceof ServerPlayer serverTarget) {
+            AttributeInstance flightAttribute = serverTarget.getAttribute(NeoForgeMod.CREATIVE_FLIGHT);
+            if (flightAttribute != null) {
+                flightAttribute.removeModifier(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "leash_flight_bypass"));
+                flightAttribute.addTransientModifier(new AttributeModifier(
+                        ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "leash_flight_bypass"),
+                        1.0,
+                        AttributeModifier.Operation.ADD_VALUE
+                ));
+            }
+        }
+
         LeashSyncPacket packet = new LeashSyncPacket(targetUUID, holderUUID);
 
         // Sync to the target and everyone tracking them
@@ -241,6 +268,20 @@ public class PlayerLeashEvents {
     public static void releaseLeash(Player player, boolean dropItem) {
         java.util.UUID removed = LEASHED_PLAYERS.remove(player.getUUID());
         if (removed == null) return;
+
+        // Re-enable flying kick restrictions (because I guess people might be hacking in a modded server?)
+        if (player instanceof ServerPlayer serverPlayer) {
+            AttributeInstance flightAttribute = serverPlayer.getAttribute(NeoForgeMod.CREATIVE_FLIGHT);
+            if (flightAttribute != null) {
+                flightAttribute.removeModifier(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "leash_flight_bypass"));
+            }
+
+            //Ground player if not creative or spectator
+            if (!serverPlayer.isCreative() && !serverPlayer.isSpectator()) {
+                player.getAbilities().flying = false;
+                player.onUpdateAbilities();
+            }
+        }
         
         LeashSyncPacket emptyPacket = new LeashSyncPacket(player.getUUID(), null);
 
