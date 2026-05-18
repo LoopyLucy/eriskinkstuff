@@ -10,8 +10,6 @@ import net.minecraft.resources.ResourceLocation;
  * during the layer registration process.
  */
 public class ModModelLayers {
-    /** Layer location for the Collar model. */
-    public static final ModelLayerLocation COLLAR = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "collar"), "main");
     /** Layer location for the Mittens model. */
     public static final ModelLayerLocation MITTENS = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "mittens"), "main");
 }

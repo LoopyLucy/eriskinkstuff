@@ -1,6 +1,7 @@
 package co.uk.loopylucy.kinkstuff.client;
 
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
+import co.uk.loopylucy.kinkstuff.client.models.MittensModel;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

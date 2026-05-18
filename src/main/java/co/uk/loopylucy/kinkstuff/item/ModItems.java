@@ -23,6 +23,7 @@ public class ModItems {
 
     /** The Collar curio item. Used to enable leashing on players. */
     public static final DeferredItem<CollarItem> COLLAR = ITEMS.register("collar", CollarItem::new);
+    public static final DeferredItem<CollarItem> COLLAR_TEST = ITEMS.register("collar_test", CollarItem::new);
     
     /** The Mittens curio item. Prevents players from holding items. */
     public static final DeferredItem<MittensItem> MITTENS = ITEMS.register("mittens", MittensItem::new);

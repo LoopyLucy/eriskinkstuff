@@ -1,6 +1,7 @@
 {
     "replace": false,
     "values": [
-        "eriskinkstuff:collar"
+        "eriskinkstuff:collar",
+        "eriskinkstuff:collar_test"
     ]
 }

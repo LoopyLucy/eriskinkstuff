@@ -1,4 +1,4 @@
-package co.uk.loopylucy.kinkstuff.client;
+package co.uk.loopylucy.kinkstuff.client.models;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;

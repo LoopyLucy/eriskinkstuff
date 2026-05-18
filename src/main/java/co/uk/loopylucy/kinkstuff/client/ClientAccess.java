@@ -1,5 +1,7 @@
 package co.uk.loopylucy.kinkstuff.client;
 
+import co.uk.loopylucy.kinkstuff.client.models.MittensModel;
+
 /**
  * A utility class providing global access to client-side mod components.
  * This is primarily used to store static references to models initialized 
