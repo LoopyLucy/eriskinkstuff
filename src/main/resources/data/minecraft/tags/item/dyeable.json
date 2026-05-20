@@ -2,9 +2,9 @@
     "replace": false,
     "values": [
         "eriskinkstuff:collar",
-        "eriskinkstuff:collar_test",
         "eriskinkstuff:mittens",
         "eriskinkstuff:clicker",
-        "eriskinkstuff:pet_bed"
+        "eriskinkstuff:pet_bed",
+        "eriskinkstuff:latex_bodysuit"
     ]
 }

@@ -4,6 +4,7 @@ import co.uk.loopylucy.kinkstuff.block.ModBlocks;
 import co.uk.loopylucy.kinkstuff.block.blocks.PetBedBlock;
 import co.uk.loopylucy.kinkstuff.block.entity.PetBedBlockEntity;
 import co.uk.loopylucy.kinkstuff.init.ModBlockEntities;
+import co.uk.loopylucy.kinkstuff.init.ModComponents;
 import co.uk.loopylucy.kinkstuff.init.ModCreativeTabs;
 import co.uk.loopylucy.kinkstuff.init.ModRecipes;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
@@ -58,6 +59,7 @@ public class ErisKinkStuff {
         ModBlockEntities.register(modEventBus);
         ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
+        ModComponents.COMPONENTS.register(modEventBus);
 
         // Register the mod instance to the main NeoForge event bus
         NeoForge.EVENT_BUS.register(this);

@@ -4,6 +4,7 @@ import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.block.ModBlocks;
 import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
 import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
+import co.uk.loopylucy.kinkstuff.item.items.LatexBodysuit;
 import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
@@ -21,15 +22,17 @@ public class ModItems {
     /** The registry for items, keyed by the mod ID. */
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ErisKinkStuff.MODID);
 
+
     /** The Collar curio item. Used to enable leashing on players. */
     public static final DeferredItem<CollarItem> COLLAR = ITEMS.register("collar", CollarItem::new);
-    public static final DeferredItem<CollarItem> COLLAR_TEST = ITEMS.register("collar_test", CollarItem::new);
     
     /** The Mittens curio item. Prevents players from holding items. */
     public static final DeferredItem<MittensItem> MITTENS = ITEMS.register("mittens", MittensItem::new);
     
     /** The Clicker item. Used to command collared players to look at the user. */
     public static final DeferredItem<ClickerItem> CLICKER = ITEMS.register("clicker", ClickerItem::new);
+
+    public static final DeferredItem<LatexBodysuit> LATEX_BODYSUIT = ITEMS.register("latex_bodysuit", LatexBodysuit::new);
 
     /** 
      * The Pet Bed block item. 

@@ -44,7 +44,6 @@ public class CollarRenderer implements ICurioRenderer {
             float headPitch) {
 
         if (renderLayerParent.getModel() instanceof HumanoidModel<?> humanoidModel) {
-
             BakedModel baseModel = Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(this.modelLocation));
 
             BakedModel finalModel = baseModel.getOverrides().resolve(
