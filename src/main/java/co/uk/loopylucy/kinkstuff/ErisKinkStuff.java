@@ -26,13 +26,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
 
 /**
  * The main mod class for Eri's Kink Stuff.
@@ -47,7 +44,6 @@ public class ErisKinkStuff {
     public ErisKinkStuff(IEventBus modEventBus, ModContainer modContainer) {
         // Register lifecycle and setup listeners
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerPackets);
         modEventBus.addListener(this::registerBlockColors);
         modEventBus.addListener(this::registerItemColors);
@@ -77,15 +73,7 @@ public class ErisKinkStuff {
         LOGGER.info("Common Loaded!");
     }
 
-    /**
-     * Registers custom capabilities for modded items.
-     * Currently used to integrate with the Curios API.
-     */
-    private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.COLLAR.get());
-        event.registerItem(CuriosCapability.ITEM, (stack, context) -> CuriosApi.getCurio(stack).orElse(null), ModItems.MITTENS.get());
-        LOGGER.info("Capabilities Registered!");
-    }
+
 
     /**
      * Registers network packets for client-server communication.

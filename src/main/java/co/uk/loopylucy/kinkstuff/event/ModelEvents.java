@@ -15,11 +15,15 @@ public class ModelEvents {
     public static ResourceLocation COLLAR_MODEL =
             ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/collar_model");
 
+    public static ResourceLocation BLINDFOLD_MODEL =
+            ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/blindfold_model");
+
     /**
      * Initializes additional model JSON files for rendering
      */
     @SubscribeEvent
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(ModelResourceLocation.standalone(COLLAR_MODEL));
+        event.register(ModelResourceLocation.standalone(BLINDFOLD_MODEL));
     }
 }

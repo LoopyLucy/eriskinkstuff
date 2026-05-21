@@ -2,10 +2,7 @@ package co.uk.loopylucy.kinkstuff.item;
 
 import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.block.ModBlocks;
-import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
-import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
-import co.uk.loopylucy.kinkstuff.item.items.LatexBodysuit;
-import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
+import co.uk.loopylucy.kinkstuff.item.items.*;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -32,7 +29,11 @@ public class ModItems {
     /** The Clicker item. Used to command collared players to look at the user. */
     public static final DeferredItem<ClickerItem> CLICKER = ITEMS.register("clicker", ClickerItem::new);
 
-    public static final DeferredItem<LatexBodysuit> LATEX_BODYSUIT = ITEMS.register("latex_bodysuit", LatexBodysuit::new);
+    /** The Catsuit item. A cosmetic skin replacement style item. */
+    public static final DeferredItem<LatexBodysuitItem> LATEX_BODYSUIT = ITEMS.register("latex_bodysuit", LatexBodysuitItem::new);
+
+    /** The Blindfold. Blinds the player like a pumpkin. */
+    public static final DeferredItem<BlindfoldItem>  BLINDFOLD = ITEMS.register("blindfold", BlindfoldItem::new);
 
     /** 
      * The Pet Bed block item. 

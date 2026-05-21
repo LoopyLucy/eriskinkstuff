@@ -21,10 +21,10 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 /**
  * Custom renderer for the Collar curio item.
  */
-public class CollarRenderer implements ICurioRenderer {
+public class CuriosHeadItemRenderer implements ICurioRenderer {
 
     private final ResourceLocation modelLocation;
-    public CollarRenderer(ResourceLocation modelLocation) {
+    public CuriosHeadItemRenderer(ResourceLocation modelLocation) {
         this.modelLocation = modelLocation;
     }
 
@@ -56,11 +56,11 @@ public class CollarRenderer implements ICurioRenderer {
             if (finalModel == null) finalModel = baseModel;
 
             matrixStack.pushPose();
-            humanoidModel.body.translateAndRotate(matrixStack);
-            matrixStack.translate(0.0F, 0.54F, 0.0F);
+            humanoidModel.head.translateAndRotate(matrixStack);
+            matrixStack.translate(0.0F, -0.5F, 0.0F);
             matrixStack.mulPose(Axis.XP.rotationDegrees(180.0F));
             matrixStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-            float scale = 1.0F;
+            float scale = 1.15F;
             matrixStack.scale(scale, scale, scale);
 
             Minecraft.getInstance().getItemRenderer().render(

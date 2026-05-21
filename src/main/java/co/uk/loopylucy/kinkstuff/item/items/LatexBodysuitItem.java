@@ -8,8 +8,8 @@ import net.minecraft.world.item.component.DyedItemColor;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-public class LatexBodysuit extends Item implements ICurioItem {
-    public LatexBodysuit() {
+public class LatexBodysuitItem extends Item implements ICurioItem {
+    public LatexBodysuitItem() {
         super(new Item.Properties()
                 .stacksTo(1)
                 .component(ModComponents.OVERLAY_INFO.get(), new ModComponents.OverlayInfo("eriskinkstuff:textures/entity/latex_bodysuit.png", 0xFFbdbdbd, true))

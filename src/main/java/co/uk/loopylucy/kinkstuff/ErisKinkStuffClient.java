@@ -3,10 +3,7 @@ package co.uk.loopylucy.kinkstuff;
 import co.uk.loopylucy.kinkstuff.client.*;
 import co.uk.loopylucy.kinkstuff.client.models.MittensModel;
 import co.uk.loopylucy.kinkstuff.item.ModItems;
-import co.uk.loopylucy.kinkstuff.item.items.ClickerItem;
-import co.uk.loopylucy.kinkstuff.item.items.CollarItem;
-import co.uk.loopylucy.kinkstuff.item.items.LatexBodysuit;
-import co.uk.loopylucy.kinkstuff.item.items.MittensItem;
+import co.uk.loopylucy.kinkstuff.item.items.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -20,7 +17,7 @@ import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 /**
  * The main client-side mod class.
- * Handles the registration of renderers, models, and color handlers that are only 
+ * Handles the registration of renderers, models, and colour handlers that are only
  * relevant on the logical client.
  */
 @Mod(value = ErisKinkStuff.MODID, dist = Dist.CLIENT)
@@ -34,11 +31,12 @@ public class ErisKinkStuffClient {
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork( () -> {
             // Register renderers for items that appear on the player model
-            CuriosRendererRegistry.register(ModItems.COLLAR.get(), () -> new CollarRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/collar_model")));
+            CuriosRendererRegistry.register(ModItems.COLLAR.get(), () -> new CuriosBodyItemRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/collar_model")));
+            CuriosRendererRegistry.register(ModItems.BLINDFOLD.get(), () -> new CuriosHeadItemRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/blindfold_model")));
             CuriosRendererRegistry.register(ModItems.MITTENS.get(), () -> new MittensRenderer( new MittensModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModModelLayers.MITTENS))));
             CuriosRendererRegistry.register(ModItems.LATEX_BODYSUIT.get(), () -> new SkinOverlayRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "textures/entity/latex_bodysuit.png")));
         });
-        ErisKinkStuff.LOGGER.info("Client Loaded and Renderer Registered!");
+        ErisKinkStuff.LOGGER.info("Client Loaded and Renderers Registered!");
     }
 
     /**
@@ -52,24 +50,22 @@ public class ErisKinkStuffClient {
     }
 
     /**
-     * Registers color handlers for dyeable items on the client.
+     * Registers colour handlers for dyeable items on the client.
      */
     @SubscribeEvent
     public static void onItemColorHandler(RegisterColorHandlersEvent.Item event) {
         ErisKinkStuff.LOGGER.info("Colour Handler Started!");
         
-        // Collar color handler
+        // Collar colour handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof CollarItem collar && tintIndex == 0) {
                 int colour = collar.getColor(itemStack);
                 return (colour == 0xFFFFFF) ? 0xFFFFFFFF : (0xFF000000 | colour);
             }
             return -1;
-        },
-                ModItems.COLLAR.get()
-        );
+        }, ModItems.COLLAR.get());
 
-        // Mittens color handler
+        // Mittens colour handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof MittensItem mittens && tintIndex == 0) {
                 int colour = mittens.getColor(itemStack);
@@ -78,7 +74,7 @@ public class ErisKinkStuffClient {
             return -1;
         }, ModItems.MITTENS.get());
 
-        // Clicker color handler
+        // Clicker colour handler
         event.register((itemStack, tintIndex) -> {
             if (itemStack.getItem() instanceof ClickerItem collar && tintIndex == 0) {
                 int colour = collar.getColor(itemStack);
@@ -89,12 +85,21 @@ public class ErisKinkStuffClient {
 
         //Latex Bodysuit handler
         event.register((itemStack, tintIndex) -> {
-            if (itemStack.getItem() instanceof LatexBodysuit latexBodysuit && tintIndex == 0 ) {
-                int colour = latexBodysuit.getColor(itemStack);
+            if (itemStack.getItem() instanceof LatexBodysuitItem latexBodysuitItem && tintIndex == 0 ) {
+                int colour = latexBodysuitItem.getColor(itemStack);
                 return (colour == 0xFFFFFF) ? 0xFFFFFFFF : (0xFF000000 | colour);
             }
             return -1;
         }, ModItems.LATEX_BODYSUIT.get());
+
+
+        event.register((itemStack, tintIndex) -> {
+            if (itemStack.getItem() instanceof BlindfoldItem blindfoldItem && tintIndex == 0 ) {
+                int colour = blindfoldItem.getColor(itemStack);
+                return (colour == 0xFFFFFF) ? 0xFFFFFFFF : (0xFF000000 | colour);
+            }
+            return -1;
+        }, ModItems.BLINDFOLD.get());
 
         ErisKinkStuff.LOGGER.info("Colour Handler Registered!");
     }
@@ -105,6 +110,6 @@ public class ErisKinkStuffClient {
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ModModelLayers.MITTENS, MittensModel::createLayer);
-        ErisKinkStuff.LOGGER.info("Collar Layer Registered!");
+        ErisKinkStuff.LOGGER.info("Mod Layers Registered!");
     }
 }

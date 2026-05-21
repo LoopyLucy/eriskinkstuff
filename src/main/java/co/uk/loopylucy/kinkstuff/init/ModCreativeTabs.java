@@ -32,6 +32,7 @@ public class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.COLLAR);
                         output.accept(Items.LEAD);
+                        output.accept(ModItems.LATEX_BODYSUIT);
                         output.accept(ModItems.MITTENS);
                         output.accept(ModItems.CLICKER);
                         output.accept(ModItems.PET_BED);

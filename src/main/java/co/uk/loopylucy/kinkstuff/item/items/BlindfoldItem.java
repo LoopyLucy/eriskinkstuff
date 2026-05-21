@@ -12,12 +12,12 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
  * When equipped in the 'Necklace' Curios slot, it allows other players to 
  * leash the wearer using a Lead.
  */
-public class CollarItem extends Item implements ICurioItem {
+public class BlindfoldItem extends Item implements ICurioItem {
 
-    public CollarItem() {
-        super(new Item.Properties()
+    public BlindfoldItem() {
+        super(new Properties()
                 .stacksTo(1)
-                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFF86644C, false))
+                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFFFF, false))
         );
     }
 
@@ -29,7 +29,7 @@ public class CollarItem extends Item implements ICurioItem {
      */
     public int getColor(ItemStack stack) {
         DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);
-        return dyedItemColor != null ? dyedItemColor.rgb() : 0xFF86644C;
+        return dyedItemColor != null ? dyedItemColor.rgb() : 0xFFFFFFFF;
     }
 
     @Override
