@@ -1,5 +1,6 @@
 package co.uk.loopylucy.kinkstuff.network;
 
+import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
 import co.uk.loopylucy.kinkstuff.client.ClientLeashTracker;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -20,7 +21,7 @@ import java.util.UUID;
  */
 public record LeashSyncPacket(UUID target, UUID holder) implements CustomPacketPayload {
     /** The unique identifier for this packet type. */
-    public static final Type<LeashSyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("eriskinkstuff", "leash_sync"));
+    public static final Type<LeashSyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "leash_sync"));
 
     /** The codec used to serialize and deserialize this packet over the network. */
     public static final StreamCodec<FriendlyByteBuf, LeashSyncPacket> CODEC = StreamCodec.of(

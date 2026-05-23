@@ -1,7 +1,7 @@
 package co.uk.loopylucy.kinkstuff.recipes;
 
-import co.uk.loopylucy.kinkstuff.init.ModRecipes;
-import co.uk.loopylucy.kinkstuff.item.ModItems;
+import co.uk.loopylucy.kinkstuff.registration.ModRecipes;
+import co.uk.loopylucy.kinkstuff.registration.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;

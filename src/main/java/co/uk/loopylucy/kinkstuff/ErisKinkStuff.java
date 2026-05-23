@@ -1,19 +1,14 @@
 package co.uk.loopylucy.kinkstuff;
 
-import co.uk.loopylucy.kinkstuff.block.ModBlocks;
-import co.uk.loopylucy.kinkstuff.block.blocks.PetBedBlock;
-import co.uk.loopylucy.kinkstuff.block.entity.PetBedBlockEntity;
-import co.uk.loopylucy.kinkstuff.init.ModBlockEntities;
-import co.uk.loopylucy.kinkstuff.init.ModComponents;
-import co.uk.loopylucy.kinkstuff.init.ModCreativeTabs;
-import co.uk.loopylucy.kinkstuff.init.ModRecipes;
-import co.uk.loopylucy.kinkstuff.item.ModItems;
+import co.uk.loopylucy.kinkstuff.registration.ModBlocks;
+import co.uk.loopylucy.kinkstuff.registration.ModBlockEntities;
+import co.uk.loopylucy.kinkstuff.registration.ModDataComponents;
+import co.uk.loopylucy.kinkstuff.registration.ModCreativeTabs;
+import co.uk.loopylucy.kinkstuff.registration.ModRecipes;
+import co.uk.loopylucy.kinkstuff.registration.ModItems;
 import co.uk.loopylucy.kinkstuff.network.LeashServerPacket;
 import co.uk.loopylucy.kinkstuff.network.LeashSyncPacket;
-import co.uk.loopylucy.kinkstuff.sound.ModSounds;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.DyedItemColor;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import co.uk.loopylucy.kinkstuff.registration.ModSounds;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
@@ -45,8 +40,7 @@ public class ErisKinkStuff {
         // Register lifecycle and setup listeners
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerPackets);
-        modEventBus.addListener(this::registerBlockColors);
-        modEventBus.addListener(this::registerItemColors);
+
 
         // Register all modded content
         ModItems.register(modEventBus);
@@ -55,7 +49,7 @@ public class ErisKinkStuff {
         ModBlockEntities.register(modEventBus);
         ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
-        ModComponents.COMPONENTS.register(modEventBus);
+        ModDataComponents.COMPONENTS.register(modEventBus);
 
         // Register the mod instance to the main NeoForge event bus
         NeoForge.EVENT_BUS.register(this);
@@ -73,60 +67,14 @@ public class ErisKinkStuff {
         LOGGER.info("Common Loaded!");
     }
 
-
-
     /**
      * Registers network packets for client-server communication.
      */
     private void registerPackets(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(MODID);
-
         registrar.playToClient(LeashSyncPacket.TYPE, LeashSyncPacket.CODEC, LeashSyncPacket::handle);
         registrar.playToServer(LeashServerPacket.TYPE, LeashServerPacket.CODEC, LeashServerPacket::handle);
         LOGGER.info("Packets Registered!");
-    }
-
-    /**
-     * Handles block color registration for dyeable blocks like the Pet Bed.
-     */
-    private void registerBlockColors(RegisterColorHandlersEvent.Block event) {
-        event.register((state, level, pos, tintIndex) -> {
-            if (level != null && pos != null) {
-                // Logic to resolve the 'origin' position of a multi-block Pet Bed
-                net.minecraft.core.Direction facing = state.getValue(PetBedBlock.FACING);
-                int x = state.getValue(PetBedBlock.X_PART);
-                int z = state.getValue(PetBedBlock.Z_PART);
-
-                net.minecraft.core.BlockPos gridShift = switch (facing) {
-                    case NORTH -> net.minecraft.core.BlockPos.ZERO.east(x).south(z);
-                    case SOUTH -> net.minecraft.core.BlockPos.ZERO.west(x).north(z);
-                    case WEST  -> net.minecraft.core.BlockPos.ZERO.north(x).east(z);
-                    case EAST  -> net.minecraft.core.BlockPos.ZERO.south(x).west(z);
-                    default    -> net.minecraft.core.BlockPos.ZERO;
-                };
-
-                net.minecraft.core.BlockPos originPos = pos.subtract(gridShift);
-
-                // Fetch the custom color from the BlockEntity
-                if (level.getBlockEntity(originPos) instanceof PetBedBlockEntity bedBE) {
-                    return bedBE.getCustomColour();
-                }
-            }
-            return -1;
-        }, ModBlocks.PET_BED.get());
-    }
-
-    /**
-     * Handles item color registration for dyeable items.
-     */
-    private void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tintIndex) -> {
-            if (tintIndex == 0) {
-                DyedItemColor dyedColor = stack.get(DataComponents.DYED_COLOR);
-                return dyedColor != null ? dyedColor.rgb() : 0xFFFFFF;
-            }
-            return -1;
-        }, ModItems.PET_BED.get());
     }
 
     @SubscribeEvent

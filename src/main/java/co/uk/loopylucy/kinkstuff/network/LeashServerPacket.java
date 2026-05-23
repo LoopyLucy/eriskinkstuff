@@ -1,6 +1,7 @@
 package co.uk.loopylucy.kinkstuff.network;
 
-import co.uk.loopylucy.kinkstuff.event.PlayerLeashEvents;
+import co.uk.loopylucy.kinkstuff.ErisKinkStuff;
+import co.uk.loopylucy.kinkstuff.common.LeashManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -22,7 +23,7 @@ import java.util.UUID;
  */
 public record LeashServerPacket(UUID targetUUID, InteractionHand hand) implements CustomPacketPayload {
     /** The unique identifier for this packet type. */
-    public static final Type<LeashServerPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath("eriskinkstuff", "leash_server"));
+    public static final Type<LeashServerPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "leash_server"));
 
     /** The codec used to serialize and deserialize this packet over the network. */
     public static final StreamCodec<FriendlyByteBuf, LeashServerPacket> CODEC = StreamCodec.of(
@@ -49,7 +50,7 @@ public record LeashServerPacket(UUID targetUUID, InteractionHand hand) implement
                 net.minecraft.world.entity.Entity targetEntity = holder.serverLevel().getEntity(payload.targetUUID());
                 if (targetEntity instanceof net.minecraft.world.entity.player.Player targetPlayer) {
                     // Delegate to the central leash logic handler
-                    PlayerLeashEvents.handleServerLeashLogic(holder, targetPlayer, payload.hand());
+                    LeashManager.handleServerLeashLogic(holder, targetPlayer, payload.hand());
                 }
             }
         });

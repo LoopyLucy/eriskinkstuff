@@ -1,6 +1,6 @@
 package co.uk.loopylucy.kinkstuff.client;
 
-import co.uk.loopylucy.kinkstuff.client.models.MittensModel;
+import co.uk.loopylucy.kinkstuff.client.model.MittensModel;
 
 /**
  * A utility class providing global access to client-side mod components.
