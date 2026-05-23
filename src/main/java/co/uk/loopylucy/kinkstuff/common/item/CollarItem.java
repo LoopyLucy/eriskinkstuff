@@ -22,10 +22,10 @@ public class CollarItem extends Item implements ICurioItem {
     }
 
     /**
-     * Gets the dye color of the collar.
+     * Gets the dye colour of the collar.
      * 
      * @param stack The collar ItemStack.
-     * @return The packed RGB integer color.
+     * @return The packed RGB integer colour.
      */
     public int getColour(ItemStack stack) {
         DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);

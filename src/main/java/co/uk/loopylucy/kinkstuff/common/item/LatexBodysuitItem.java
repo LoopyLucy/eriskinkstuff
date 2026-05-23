@@ -22,9 +22,9 @@ public class LatexBodysuitItem extends Item implements ICurioItem {
     }
 
     /**
-     * Gets the dye colour of the collar.
+     * Gets the dye colour of the catsuit.
      *
-     * @param stack The collar ItemStack.
+     * @param stack The catsuit ItemStack.
      * @return The packed RGB integer colour.
      */
     public int getColour(ItemStack stack) {
@@ -34,6 +34,6 @@ public class LatexBodysuitItem extends Item implements ICurioItem {
 
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
-        // No periodic logic currently required for the collar
+        // No periodic logic currently required for the catsuit
     }
 }

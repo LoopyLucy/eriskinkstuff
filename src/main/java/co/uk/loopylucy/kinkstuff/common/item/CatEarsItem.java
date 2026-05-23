@@ -20,9 +20,9 @@ public class CatEarsItem extends Item implements ICurioItem {
     }
 
     /**
-     * Gets the dye colour of the collar.
+     * Gets the dye colour of the cat ears.
      *
-     * @param stack The collar ItemStack.
+     * @param stack The cat ears ItemStack.
      * @return The packed RGB integer colour.
      */
     public int getColour(ItemStack stack) {

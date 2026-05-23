@@ -23,9 +23,9 @@ public class MittensItem extends Item implements ICurioItem {
     }
 
     /**
-     * Gets the dye colour of the collar.
+     * Gets the dye colour of the mittens.
      *
-     * @param stack The collar ItemStack.
+     * @param stack The mittens ItemStack.
      * @return The packed RGB integer colour.
      */
     public int getColour(ItemStack stack) {

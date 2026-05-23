@@ -19,7 +19,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 /**
- * Custom renderer for the Collar curio item.
+ * Custom renderer for items worn on the player's head.
  */
 public class HeadItemRenderer implements ICurioRenderer {
 

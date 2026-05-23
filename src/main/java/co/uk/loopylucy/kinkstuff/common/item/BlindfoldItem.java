@@ -21,9 +21,9 @@ public class BlindfoldItem extends Item implements ICurioItem {
     }
 
     /**
-     * Gets the dye colour of the collar.
-     *
-     * @param stack The collar ItemStack.
+     * Gets the dye colour of the blindfold.
+     * 
+     * @param stack The blindfold ItemStack.
      * @return The packed RGB integer colour.
      */
     public int getColour(ItemStack stack) {
@@ -33,6 +33,6 @@ public class BlindfoldItem extends Item implements ICurioItem {
 
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
-        // No periodic logic currently required for the collar
+        // No periodic logic currently required for the blindfold
     }
 }
