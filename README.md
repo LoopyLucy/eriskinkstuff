@@ -1,4 +1,4 @@
-# Eri's Kink Stuff!
+# Tameable Players!
 
 A Minecraft mod designed to provide tools for players to express and fulfill various roleplay scenarios and themes within the world or Minecraft.
 
@@ -16,7 +16,7 @@ The heart of the mod is a system that allows players to be tied together and led
 ### ⛓️ The Collar
 A decorative and functional item worn around the neck.
 * **Style:** A visible 3D model that stays on your character's neck.
-* **Dyeable:** Can be coloured with any combination of dyes, just like leather armor.
+* **Dyeable:** Can be coloured with any combination of dyes, just like leather armour.
 * **Purpose:** The essential starting point for leashing and obedience training.
 
 ### 🧤 Mittens (Hand Restraints)
@@ -53,7 +53,7 @@ A simple tool for training and commands.
 A comfortable, low-profile bed for pets to rest on.
 * **Custom Colours:** Made from wool and carpet, inheriting the colours of the materials used. Can also be dyed further after crafting.
 * **Fully Functional:** Acts as a real bed where you can sleep and set your home point.
-* **Cozy Design:** A large, futon-style bed that fits perfectly into a pet's corner.
+* **Cosy Design:** A large, futon-style bed that fits perfectly into a pet's corner.
 
 ## 🛠️ Requirements
 * **[Minecraft](https://www.minecraft.net/):** *(Version: 1.21.1)*
@@ -64,7 +64,7 @@ A comfortable, low-profile bed for pets to rest on.
 * **[Female Gender](https://modrinth.com/mod/female-gender):** Highly recommended to enhance character customization for specific roleplay aesthetics.
 
 ## 🎨 Getting Started
-Currently most items can be found in the custom "Eri's Kink Stuff" tab in the creative menu.
+Currently most items can be found in the custom "Tameable Players" tab in the creative menu.
 
 ---
 *Developed with love for the community.*

@@ -1,11 +1,11 @@
 {
     "replace": false,
     "values": [
-        "eriskinkstuff:collar",
-        "eriskinkstuff:blindfold",
-        "eriskinkstuff:mittens",
-        "eriskinkstuff:clicker",
-        "eriskinkstuff:pet_bed",
-        "eriskinkstuff:latex_bodysuit"
+        "tameableplayers:collar",
+        "tameableplayers:blindfold",
+        "tameableplayers:mittens",
+        "tameableplayers:clicker",
+        "tameableplayers:pet_bed",
+        "tameableplayers:latex_bodysuit"
     ]
 }

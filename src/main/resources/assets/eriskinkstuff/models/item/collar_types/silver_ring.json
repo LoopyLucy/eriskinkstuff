@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "eriskinkstuff:item/collar_dyeable",
-    "layer1": "eriskinkstuff:item/collar_types/pendant_silver_ring"
-  }
-}

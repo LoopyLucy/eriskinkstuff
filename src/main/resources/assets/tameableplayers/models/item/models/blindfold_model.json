@@ -1,0 +1,21 @@
+{
+	"format_version": "1.9.0",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "tameableplayers:item/models/blindfold_dyeable",
+		"particle": "tameableplayers:item/models/blindfold_dyeable"
+	},
+	"elements": [
+		{
+			"from": [4, 0, 4],
+			"to": [12, 8, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 4]},
+			"faces": {
+				"north": {"uv": [4, 4, 8, 8], "texture": "#0", "tintindex": 0},
+				"east": {"uv": [0, 4, 4, 8], "texture": "#0", "tintindex": 0},
+				"south": {"uv": [12, 4, 16, 8], "texture": "#0", "tintindex": 0},
+				"west": {"uv": [8, 4, 12, 8], "texture": "#0", "tintindex": 0}
+			}
+		}
+	]
+}

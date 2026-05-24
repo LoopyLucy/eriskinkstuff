@@ -1,0 +1,19 @@
+{
+    "itemGroup.tameableplayers": "Tameable Players!",
+    "creativetab.tameableplayers.tab": "Tameable Players",
+
+    "item.tameableplayers.clicker": "Clicker",
+
+    "item.tameableplayers.collar": "Collar",
+    "item.tameableplayers.mittens": "Mittens",
+    "item.tameableplayers.latex_bodysuit": "Burnished Leather Catsuit",
+    "item.tameableplayers.blindfold": "Blindfold",
+    "item.tameableplayers.cat_ears": "Cat Ears",
+
+    "item.tameableplayers.pet_bed": "Pet Bed",
+    "block.tameableplayers.pet_bed": "Pet Bed",
+
+    "tameableplayers.configuration.title": "Tameable Players Configs",
+    "tameableplayers.configuration.section.tameableplayers.common.toml": "Tameable Players Configs",
+    "tameableplayers.configuration.section.tameableplayers.common.toml.title": "Tameable Players Configs"
+}

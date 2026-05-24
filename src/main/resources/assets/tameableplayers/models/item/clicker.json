@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "tameableplayers:item/clicker_dyeable",
+        "layer1": "tameableplayers:item/clicker_button"
+    }
+}

@@ -46,7 +46,7 @@ authors="LoopyLucy (Eri)"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A collection of kinky items and systems!
+A collection of playful items and systems!
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

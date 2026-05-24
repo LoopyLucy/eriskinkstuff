@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "sources": [
+    { "type": "single", "resource": "tameableplayers:entity/dyeable_collar_base" },
+    { "type": "single", "resource": "tameableplayers:entity/gold_collar" },
+    { "type": "single", "resource": "tameableplayers:entity/ringed_collar" },
+    { "type": "single", "resource": "tameableplayers:entity/studded_collar" },
+    { "type": "single", "resource": "tameableplayers:entity/mittens_dyeable" }
+  ]
+}

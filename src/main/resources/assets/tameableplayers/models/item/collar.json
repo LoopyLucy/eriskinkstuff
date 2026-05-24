@@ -1,0 +1,33 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "tameableplayers:item/collar_dyeable",
+        "layer1": "tameableplayers:item/collar_types/pendant_blank"
+    },
+    "overrides": [
+        {
+            "predicate": {"custom_model_data": 1},
+            "model": "tameableplayers:item/collar_types/gold_coin"
+        },
+        {
+            "predicate": {"custom_model_data": 2},
+            "model": "tameableplayers:item/collar_types/silver_coin"
+        },
+        {
+            "predicate": {"custom_model_data": 3},
+            "model": "tameableplayers:item/collar_types/gold_ring"
+        },
+        {
+            "predicate": {"custom_model_data": 4},
+            "model": "tameableplayers:item/collar_types/silver_ring"
+        },
+        {
+            "predicate": {"custom_model_data": 5},
+            "model": "tameableplayers:item/collar_types/gold_spikes"
+        },
+        {
+            "predicate": {"custom_model_data": 6},
+            "model": "tameableplayers:item/collar_types/silver_spikes"
+        }
+    ]
+}

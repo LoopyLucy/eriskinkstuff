@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "tameableplayers:item/collar_dyeable",
+    "layer1": "tameableplayers:item/collar_types/pendant_silver_ring"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "eriskinkstuff:blindfold",
-    "eriskinkstuff:cat_ears"
+    "tameableplayers:blindfold",
+    "tameableplayers:cat_ears"
   ]
 }
