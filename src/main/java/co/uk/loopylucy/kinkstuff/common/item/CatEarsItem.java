@@ -1,9 +1,9 @@
 package co.uk.loopylucy.kinkstuff.common.item;
 
-import net.minecraft.core.component.DataComponents;
+import co.uk.loopylucy.kinkstuff.common.component.ColourData;
+import co.uk.loopylucy.kinkstuff.registration.ModDataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.DyedItemColor;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
@@ -15,19 +15,30 @@ public class CatEarsItem extends Item implements ICurioItem {
     public CatEarsItem() {
         super(new Properties()
                 .stacksTo(1)
-                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFFFF, false))
+                .component(ModDataComponents.ITEM_COLOURS, new ColourData(0xFFFFFF, 0xFFFFFF))
         );
     }
 
     /**
-     * Gets the dye colour of the cat ears.
+     * Gets the first dye colour of the cat ears.
      *
      * @param stack The cat ears ItemStack.
      * @return The packed RGB integer colour.
      */
-    public int getColour(ItemStack stack) {
-        DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);
-        return dyedItemColor != null ? dyedItemColor.rgb() : 0xFFFFFFFF;
+    public int getColour0(ItemStack stack) {
+        ColourData colourData = stack.get(ModDataComponents.ITEM_COLOURS.get());
+        return (colourData != null) ? colourData.colour0() : 0xFFFFFF;
+    }
+
+    /**
+     * Gets the second dye colour of the cat ears.
+     *
+     * @param stack The cat ears ItemStack.
+     * @return The packed RGB integer colour.
+     */
+    public int getColour1(ItemStack stack) {
+        ColourData colourData = stack.get(ModDataComponents.ITEM_COLOURS.get());
+        return (colourData != null) ? colourData.colour1() : 0xFFFFFF;
     }
 
     @Override

@@ -30,7 +30,7 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @EventBusSubscriber(modid = ErisKinkStuff.MODID, value = Dist.CLIENT)
 public class ClientModEvents {
@@ -48,7 +48,7 @@ public class ClientModEvents {
             CuriosRendererRegistry.register(ModItems.BLINDFOLD.get(), () -> new HeadItemRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/blindfold_model"), 0.0F, 1.0F));
             CuriosRendererRegistry.register(ModItems.MITTENS.get(), () -> new MittensRenderer( new MittensModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModModelLayers.MITTENS))));
             CuriosRendererRegistry.register(ModItems.LATEX_BODYSUIT.get(), () -> new SkinOverlayRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "textures/entity/latex_bodysuit.png")));
-            CuriosRendererRegistry.register(ModItems.CAT_EARS.get(), () -> new HeadItemRenderer(null, 1.45F, 0.4F));
+            CuriosRendererRegistry.register(ModItems.CAT_EARS.get(), () -> new HeadItemRenderer(ResourceLocation.fromNamespaceAndPath(ErisKinkStuff.MODID, "item/models/cat_ears_model"), 1.45F, 0.4F));
         });
         ErisKinkStuff.LOGGER.info("Client Loaded and Renderers Registered!");
     }
@@ -127,21 +127,34 @@ public class ClientModEvents {
     public static void onItemColorHandler(RegisterColorHandlersEvent.Item event) {
         ErisKinkStuff.LOGGER.info("Colour Handler Started!");
 
-        registerColour(event, ModItems.COLLAR.get(), stack -> ((CollarItem) stack.getItem()).getColour(stack));
-        registerColour(event, ModItems.MITTENS.get(), stack -> ((MittensItem) stack.getItem()).getColour(stack));
-        registerColour(event, ModItems.CLICKER.get(), stack -> ((ClickerItem) stack.getItem()).getColour(stack));
-        registerColour(event, ModItems.LATEX_BODYSUIT.get(), stack -> ((LatexBodysuitItem) stack.getItem()).getColour(stack));
-        registerColour(event, ModItems.BLINDFOLD.get(), stack -> ((BlindfoldItem) stack.getItem()).getColour(stack));
-        registerColour(event, ModItems.CAT_EARS.get(), stack -> ((CatEarsItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.COLLAR.get(), (stack, tintIndex) -> ((CollarItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.MITTENS.get(), (stack, tintIndex) -> ((MittensItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.CLICKER.get(), (stack, tintIndex) -> ((ClickerItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.LATEX_BODYSUIT.get(), (stack, tintIndex) -> ((LatexBodysuitItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.BLINDFOLD.get(), (stack, tintIndex) -> ((BlindfoldItem) stack.getItem()).getColour(stack));
+
+        registerColour(event, ModItems.CAT_EARS.get(), (stack, tintIndex) -> {
+            CatEarsItem earsItem = (CatEarsItem) stack.getItem();
+            return  switch (tintIndex) {
+                case 0 -> earsItem.getColour0(stack);
+                case 1 -> earsItem.getColour1(stack);
+                default -> -1;
+            };
+        });
+
+        //registerColour(event, ModItems.CAT_EARS.get(), (stack, tintIndex) -> ((CatEarsItem) stack.getItem()).getColour0(stack));
+        //registerColour(event, ModItems.CAT_EARS.get(), (stack, tintIndex) -> ((CatEarsItem) stack.getItem()).getColour1(stack));
+
 
         ErisKinkStuff.LOGGER.info("Colour Handler Registered!");
     }
 
-    private static void registerColour(RegisterColorHandlersEvent.Item event, Item item, Function<ItemStack, Integer> colourGetter) {
+    private static void registerColour(RegisterColorHandlersEvent.Item event, Item item, BiFunction<ItemStack, Integer, Integer> colourGetter) {
         event.register((itemStack, tintIndex) -> {
-            if (tintIndex != 0) return -1;
+            int colour = colourGetter.apply(itemStack, tintIndex);
 
-            int colour = colourGetter.apply(itemStack);
+            if (colour == -1) return -1;
+
             return (colour == 0xFFFFFF) ? 0xFFFFFFFF : (0xFF000000 | colour);
         }, item);
     }

@@ -1,5 +1,6 @@
 package co.uk.loopylucy.kinkstuff.registration;
 
+import co.uk.loopylucy.kinkstuff.common.component.ColourData;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.component.DataComponentType;
@@ -7,9 +8,14 @@ import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import java.util.function.Supplier;
+
 public class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> COMPONENTS =
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, "eriskinkstuff");
+
+    public static final Supplier<DataComponentType<ColourData>> ITEM_COLOURS = COMPONENTS.register("item_colours",
+            () -> DataComponentType.<ColourData>builder().persistent(ColourData.CODEC).networkSynchronized(ColourData.STREAM_CODEC).build());
 
     // A clean record to store both pieces of data together
     public record OverlayInfo(String texture, int color, boolean hideLayers) {

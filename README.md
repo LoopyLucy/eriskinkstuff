@@ -1,6 +1,6 @@
 # Eri's Kink Stuff!
 
-A Minecraft mod designed to provide tools for players to express and fulfill various roleplay scenarios and themes within the game world.
+A Minecraft mod designed to provide tools for players to express and fulfill various roleplay scenarios and themes within the world or Minecraft.
 
 ## 🔞 Intent & Purpose
 This mod is specifically crafted to help players explore specialized roleplay. It adds functional items and furniture that facilitate power dynamics, sensory play, and pet play themes in a multiplayer environment.

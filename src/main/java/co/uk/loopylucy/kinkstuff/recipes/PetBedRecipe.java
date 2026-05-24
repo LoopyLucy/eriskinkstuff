@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * A custom crafting recipe for the Pet Bed.
  * It requires three items in a horizontal row: [Wool] [Carpet] [Wool].
- * The resulting Pet Bed will have a color blended from the input wool and carpet colors.
+ * The resulting Pet Bed will have a colour blended from the input wool and carpet colours.
  */
 public class PetBedRecipe extends CustomRecipe {
     public PetBedRecipe(CraftingBookCategory category) {
@@ -67,23 +67,23 @@ public class PetBedRecipe extends CustomRecipe {
     }
 
     /**
-     * Assembles the resulting Pet Bed item with a blended color.
+     * Assembles the resulting Pet Bed item with a blended colour.
      * 
      * @param input The crafting grid input.
      * @param registries Registry access for handling components.
-     * @return A new Pet Bed ItemStack with the blended color applied.
+     * @return A new Pet Bed ItemStack with the blended colour applied.
      */
     @Override
     public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.@NotNull Provider registries) {
-        List<DyeColor> colorsFound = new ArrayList<>();
+        List<DyeColor> coloursFound = new ArrayList<>();
 
-        // Gather all dye color profiles from the wool ingredients inside the active grid
+        // Gather all dye colour profiles from the wool ingredients inside the active grid
         for (int i = 0; i < input.size(); i++) {
             ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
-                DyeColor color = getBlockDyeColor(stack);
-                if (color != null) {
-                    colorsFound.add(color);
+                DyeColor colour = getBlockDyeColour(stack);
+                if (colour != null) {
+                    coloursFound.add(colour);
                 }
             }
         }
@@ -91,32 +91,32 @@ public class PetBedRecipe extends CustomRecipe {
         // Generate the output pet bed item base
         ItemStack result = new ItemStack(ModItems.PET_BED.get());
 
-        if (!colorsFound.isEmpty()) {
+        if (!coloursFound.isEmpty()) {
             // Blending logic: averages the RGB components and scales based on brightness
             int[] rbgComponents = new int[3];
-            int maxColorValue = 0;
-            int totalColors = 0;
+            int maxColourValue = 0;
+            int totalColours = 0;
 
-            for (DyeColor color : colorsFound) {
-                // COMPILER FIX: In 1.21.1, getTextureDiffuseColor() is a direct packed integer value
-                int rgbHex = color.getTextureDiffuseColor();
+            for (DyeColor colour : coloursFound) {
+                // COMPILER FIX: In 1.21.1, getTextureDiffuseColour() is a direct packed integer value
+                int rgbHex = colour.getTextureDiffuseColor();
 
                 // Extract individual 0-255 RGB channels using standard bitwise shifting
                 int r = (rgbHex >> 16) & 0xFF;
                 int g = (rgbHex >> 8) & 0xFF;
                 int b = rgbHex & 0xFF;
 
-                maxColorValue += Math.max(r, Math.max(g, b));
+                maxColourValue += Math.max(r, Math.max(g, b));
                 rbgComponents[0] += r; 
                 rbgComponents[1] += g;
                 rbgComponents[2] += b;
-                totalColors++;
+                totalColours++;
             }
 
-            int finalHexColor = getFinalHexColor(rbgComponents, totalColors, (float) maxColorValue);
+            int finalHexColour = getFinalHexColour(rbgComponents, totalColours, (float) maxColourValue);
 
-            // Stamp the blended color directly onto the crafted item output component map
-            result.set(DataComponents.DYED_COLOR, new DyedItemColor(finalHexColor, true));
+            // Stamp the blended colour directly onto the crafted item output component map
+            result.set(DataComponents.DYED_COLOR, new DyedItemColor(finalHexColour, true));
         }
 
 
@@ -124,22 +124,22 @@ public class PetBedRecipe extends CustomRecipe {
     }
 
     /**
-     * Internal helper to calculate the final blended hex color.
+     * Internal helper to calculate the final blended hex colour.
      * 
      * @param rbgComponents Summed RGB values.
-     * @param totalColors Number of colors being blended.
-     * @param maxColorValue Summed maximum channel values for brightness scaling.
+     * @param totalColours Number of colours being blended.
+     * @param maxColourValue Summed maximum channel values for brightness scaling.
      * @return The resulting packed RGB integer.
      */
-    private static int getFinalHexColor(int[] rbgComponents, int totalColors, float maxColorValue) {
-        int blendedR = rbgComponents[0] / totalColors;
-        int blendedG = rbgComponents[1] / totalColors;
-        int blendedB = rbgComponents[2] / totalColors;
-        float averageColorValue = maxColorValue / (float) totalColors;
+    private static int getFinalHexColour(int[] rbgComponents, int totalColours, float maxColourValue) {
+        int blendedR = rbgComponents[0] / totalColours;
+        int blendedG = rbgComponents[1] / totalColours;
+        int blendedB = rbgComponents[2] / totalColours;
+        float averageColourValue = maxColourValue / (float) totalColours;
         float maxBlendedChannel = (float)Math.max(blendedR, Math.max(blendedG, blendedB));
 
         if (maxBlendedChannel > 0) {
-            float scalingFactor = averageColorValue / maxBlendedChannel;
+            float scalingFactor = averageColourValue / maxBlendedChannel;
             blendedR = (int)((float)blendedR * scalingFactor);
             blendedG = (int)((float)blendedG * scalingFactor);
             blendedB = (int)((float)blendedB * scalingFactor);
@@ -173,16 +173,16 @@ public class PetBedRecipe extends CustomRecipe {
         return blockItem.getBlock() instanceof WoolCarpetBlock;
     }
 
-    /** Extracts the DyeColor associated with a wool or carpet block. */
-    private @org.jetbrains.annotations.Nullable DyeColor getBlockDyeColor(ItemStack stack) {
+    /** Extracts the DyeColour associated with a wool or carpet block. */
+    private @org.jetbrains.annotations.Nullable DyeColor getBlockDyeColour(ItemStack stack) {
         if (!(stack.getItem() instanceof BlockItem blockItem)) return null;
         Block block = blockItem.getBlock();
 
-        // Extract the Color enum identifier out of the vanilla block name strings directly
+        // Extract the Colour enum identifier out of the vanilla block name strings directly
         String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
-        for (DyeColor color : DyeColor.values()) {
-            if (path.startsWith(color.getName())) {
-                return color;
+        for (DyeColor colour : DyeColor.values()) {
+            if (path.startsWith(colour.getName())) {
+                return colour;
             }
         }
         return DyeColor.WHITE; // Default fallback fallback
