@@ -127,7 +127,7 @@ public class ClientModEvents {
     public static void onItemColorHandler(RegisterColorHandlersEvent.Item event) {
         TameablePlayers.LOGGER.info("Colour Handler Started!");
 
-        registerColour(event, ModItems.COLLAR.get(), (stack, tintIndex) -> ((CollarItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.COLLAR.get(), (stack, tintIndex) -> tintIndex == 0 ? ((CollarItem) stack.getItem()).getColour(stack) : -1);
         registerColour(event, ModItems.MITTENS.get(), (stack, tintIndex) -> ((MittensItem) stack.getItem()).getColour(stack));
         registerColour(event, ModItems.CLICKER.get(), (stack, tintIndex) -> ((ClickerItem) stack.getItem()).getColour(stack));
         registerColour(event, ModItems.LATEX_BODYSUIT.get(), (stack, tintIndex) -> ((LatexBodysuitItem) stack.getItem()).getColour(stack));
