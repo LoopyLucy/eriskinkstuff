@@ -13,6 +13,11 @@
     "item.tameableplayers.pet_bed": "Pet Bed",
     "block.tameableplayers.pet_bed": "Pet Bed",
 
+    "item.tameableplayers.silver_ring": "Silver Ring",
+    "item.tameableplayers.gold_ring": "Gold Ring",
+    "item.tameableplayers.silver_pendant": "Silver Pendant",
+    "item.tameableplayers.gold_pendant": "Gold Pendant",
+
     "tameableplayers.configuration.title": "Tameable Players Configs",
     "tameableplayers.configuration.section.tameableplayers.common.toml": "Tameable Players Configs",
     "tameableplayers.configuration.section.tameableplayers.common.toml.title": "Tameable Players Configs"

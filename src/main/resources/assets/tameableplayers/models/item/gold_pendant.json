@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "tameableplayers:item/models/collar_types/pendant_gold_coin_model"
+  }
+}

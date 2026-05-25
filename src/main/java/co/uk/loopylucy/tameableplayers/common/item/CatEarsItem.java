@@ -15,7 +15,7 @@ public class CatEarsItem extends Item implements ICurioItem {
     public CatEarsItem() {
         super(new Properties()
                 .stacksTo(1)
-                .component(ModDataComponents.ITEM_COLOURS, new ColourData(0xFFFFFF, 0xFFFFFF))
+                .component(ModDataComponents.ITEM_COLOURS.get(), new ColourData(0xFFFFFF, 0xFFFFFF))
         );
     }
 

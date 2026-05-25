@@ -26,6 +26,13 @@ public class ModItems {
 
     public static final DeferredItem<Item> SILVER_RING = ITEMS.register("silver_ring",
             () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> GOLD_RING = ITEMS.register("gold_ring",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> SILVER_PENDANT = ITEMS.register("silver_pendant",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> GOLD_PENDANT = ITEMS.register("gold_pendant",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
     
     /** The Mittens curio item. Prevents players from holding items. */
     public static final DeferredItem<MittensItem> MITTENS = ITEMS.register("mittens", MittensItem::new);

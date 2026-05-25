@@ -37,6 +37,10 @@ public class ModCreativeTabs {
                         output.accept(ModItems.MITTENS);
                         output.accept(ModItems.CLICKER);
                         output.accept(ModItems.PET_BED);
+                        output.accept(ModItems.SILVER_RING);
+                        output.accept(ModItems.SILVER_PENDANT);
+                        output.accept(ModItems.GOLD_RING);
+                        output.accept(ModItems.GOLD_PENDANT);
                     })
                     .build());
 

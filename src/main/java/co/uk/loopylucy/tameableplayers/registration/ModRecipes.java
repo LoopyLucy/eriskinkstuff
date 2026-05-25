@@ -1,6 +1,8 @@
 package co.uk.loopylucy.tameableplayers.registration;
 
 import co.uk.loopylucy.tameableplayers.TameablePlayers;
+import co.uk.loopylucy.tameableplayers.recipes.CollarVariantRecipe;
+import co.uk.loopylucy.tameableplayers.recipes.DyeableWoolRecipe;
 import co.uk.loopylucy.tameableplayers.recipes.PetBedRecipe;
 import co.uk.loopylucy.tameableplayers.recipes.TwinToneDyeRecipe;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,4 +27,10 @@ public class ModRecipes {
 
     public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<TwinToneDyeRecipe>> TWIN_TONE_DYE =
             RECIPE_SERIALIZERS.register("twin_tone_dye", () -> new SimpleCraftingRecipeSerializer<>(TwinToneDyeRecipe::new));
+
+    public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<CollarVariantRecipe>> COLLAR_VARIANT_CRAFTING =
+            RECIPE_SERIALIZERS.register("collar_variant_crafting", () -> new SimpleCraftingRecipeSerializer<>(CollarVariantRecipe::new));
+
+    public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<DyeableWoolRecipe>> DYEABLE_WOOL_CRAFTING =
+            RECIPE_SERIALIZERS.register("dyeable_wool_crafting", () -> new SimpleCraftingRecipeSerializer<>(DyeableWoolRecipe::new));
 }
