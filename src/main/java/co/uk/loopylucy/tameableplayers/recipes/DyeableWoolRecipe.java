@@ -27,14 +27,13 @@ public class DyeableWoolRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInput input, @NotNull Level level) {
+    public boolean matches(@NotNull CraftingInput input, @NotNull Level level) {
         if (isMittensPattern(input)) return true;
-        if (isBlindfoldPattern(input)) return true;
-        return false;
+        return isBlindfoldPattern(input);
     }
 
     @Override
-    public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.@NotNull Provider registries) {
+    public @NotNull ItemStack assemble(@NotNull CraftingInput input, HolderLookup.@NotNull Provider registries) {
         ItemStack result = ItemStack.EMPTY;
         if (isMittensPattern(input)) {
             result = new ItemStack(ModItems.MITTENS.get());

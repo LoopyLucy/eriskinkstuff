@@ -18,8 +18,8 @@ public class LatexBodysuitItem extends Item implements ICurioItem {
     public LatexBodysuitItem() {
         super(new Item.Properties()
                 .stacksTo(1)
-                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFFFFFFFF, false))
-                .component(ModDataComponents.OVERLAY_INFO.get(), new ModDataComponents.OverlayInfo(TameablePlayers.MODID + ":textures/entity/latex_bodysuit.png", 0xFFbdbdbd, true))
+                .component(DataComponents.DYED_COLOR, new DyedItemColor(0xFF191919, false))
+                .component(ModDataComponents.OVERLAY_INFO.get(), new ModDataComponents.OverlayInfo(TameablePlayers.MODID + ":textures/entity/latex_bodysuit.png", 0xFF191919, true))
         );
     }
 
@@ -31,7 +31,7 @@ public class LatexBodysuitItem extends Item implements ICurioItem {
      */
     public int getColour(ItemStack stack) {
         DyedItemColor dyedItemColor = stack.get(DataComponents.DYED_COLOR);
-        return dyedItemColor != null ? dyedItemColor.rgb() : 0xFFFFFFFF;
+        return dyedItemColor != null ? dyedItemColor.rgb() : 0xFF191919;
     }
 
     @Override
