@@ -20,7 +20,7 @@ public class ModCreativeTabs {
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, "tameableplayers");
 
     /** 
-     * The main creative tab for Eri's Kink Stuff.
+     * The main creative tab for Tameable Players.
      * Uses the Collar as an icon and includes all modded items plus the Lead.
      */
     @SuppressWarnings("unused")

@@ -41,29 +41,19 @@ public class PetBedRecipe extends CustomRecipe {
      */
     @Override
     public boolean matches(CraftingInput input, @NotNull Level level) {
-        // Enforce the layout pattern: exactly 3 items in a horizontal row (Wool, Carpet, Wool)
-        if (input.ingredientCount() != 3) return false;
 
-        ItemStack slot0 = ItemStack.EMPTY;
-        ItemStack slot1 = ItemStack.EMPTY;
-        ItemStack slot2 = ItemStack.EMPTY;
+        if (input.width() < 3) return false;
 
-        // Extract the row ingredients from the grid
-        int found = 0;
-        for (int i = 0; i < input.size(); i++) {
-            ItemStack stack = input.getItem(i);
-            if (!stack.isEmpty()) {
-                if (found == 0) slot0 = stack;
-                else if (found == 1) slot1 = stack;
-                else if (found == 2) slot2 = stack;
-                found++;
+        for (int y = 0; y < input.height(); y++) {
+            ItemStack left = input.getItem(y * input.width());
+            ItemStack middle = input.getItem(y * input.width() + 1);
+            ItemStack right = input.getItem(y * input.width() + 2);
+            if (isWoolBlock(left) && isCarpetBlock(middle) && isWoolBlock(right)) {
+                return true;
             }
         }
 
-        if (found != 3) return false;
-
-        // Verify slot types: Slots 0 and 2 must be Wool Blocks, Slot 1 must be a Wool Carpet Block
-        return isWoolBlock(slot0) && isCarpetBlock(slot1) && isWoolBlock(slot2);
+        return false;
     }
 
     /**

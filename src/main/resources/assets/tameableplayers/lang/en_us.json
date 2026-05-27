@@ -20,5 +20,6 @@
 
     "tameableplayers.configuration.title": "Tameable Players Configs",
     "tameableplayers.configuration.section.tameableplayers.common.toml": "Tameable Players Configs",
-    "tameableplayers.configuration.section.tameableplayers.common.toml.title": "Tameable Players Configs"
+    "tameableplayers.configuration.section.tameableplayers.common.toml.title": "Tameable Players Configs",
+    "gui.tameableplayers.rei.dynamic": "Tameable Players Crafting"
 }

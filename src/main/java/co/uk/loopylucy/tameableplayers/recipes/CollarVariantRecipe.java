@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A custom crafting recipe for adding accessories (rings, pendants, spikes) to a collar.
- * It preserves the dye color of the collar while updating its CustomModelData to 
+ * It preserves the dye color of the collar while updating its CustomModelData to
  * change its appearance.
  */
 public class CollarVariantRecipe extends CustomRecipe {
@@ -66,19 +66,19 @@ public class CollarVariantRecipe extends CustomRecipe {
         // 3. Collar + 4 Iron Nuggets -> Silver Spikes (CMD 6)
 
         int accessoryCount = goldPendantCount + silverPendantCount + goldRingCount + silverRingCount;
-        
+
         if (accessoryCount == 1 && goldNuggetCount == 0 && ironNuggetCount == 0) return true;
-        
+
         if (accessoryCount == 0) {
             if (goldNuggetCount == 4 && ironNuggetCount == 0) return true;
-            if (ironNuggetCount == 4 && goldNuggetCount == 0) return true;
+            return ironNuggetCount == 4 && goldNuggetCount == 0;
         }
 
         return false;
     }
 
     @Override
-    public @NotNull ItemStack assemble(CraftingInput input, HolderLookup.@NotNull Provider registries) {
+    public @NotNull ItemStack assemble(@NotNull CraftingInput input, HolderLookup.@NotNull Provider registries) {
         ItemStack collar = findCollar(input).copy();
         int goldPendantCount = 0;
         int silverPendantCount = 0;
@@ -121,11 +121,6 @@ public class CollarVariantRecipe extends CustomRecipe {
             if (stack.is(ModItems.COLLAR.get())) return stack;
         }
         return ItemStack.EMPTY;
-    }
-
-    private int getCustomModelData(ItemStack stack) {
-        CustomModelData data = stack.get(DataComponents.CUSTOM_MODEL_DATA);
-        return data != null ? data.value() : 0;
     }
 
     @Override

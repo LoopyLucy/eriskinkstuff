@@ -27,7 +27,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 /**
- * The main mod class for Eri's Kink Stuff.
+ * The main mod class for Tameable Players.
  * This class handles the initialization of the mod, registration of all modded objects
  * (items, blocks, sounds, etc.), and sets up capabilities and networking.
  */

@@ -31,6 +31,9 @@ repositories {
         name = "Illusive Soulworks maven"
         url = "https://maven.theillusivec4.top/"
     }
+
+    maven { name = "REI maven"; url = "https://maven.shedaniel.me/" }
+    maven { name = "Architectury maven"; url = "https://maven.architectury.dev/" }
 }
 
 base {
@@ -125,6 +128,15 @@ dependencies {
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
     // Use the full Curios API jar at runtime
     runtimeOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+    // REI
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
+    runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+
+    // Required Dependencies for REI
+    runtimeOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+    runtimeOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
