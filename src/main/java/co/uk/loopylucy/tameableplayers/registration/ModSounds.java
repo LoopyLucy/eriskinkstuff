@@ -21,6 +21,9 @@ public class ModSounds {
     /** The Clicker sound event. Plays with a fixed range of 32 blocks. */
     public static final Supplier<SoundEvent> CLICKER = registerSoundEvent("clicker");
 
+    /** The Whip Crack sound event. */
+    public static final Supplier<SoundEvent> WHIP_CRACK = registerSoundEvent("whip_crack");
+
     /**
      * Helper method to register a sound event with a fixed range.
      * 

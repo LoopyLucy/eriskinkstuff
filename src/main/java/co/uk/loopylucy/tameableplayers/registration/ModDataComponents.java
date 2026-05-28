@@ -1,5 +1,6 @@
 package co.uk.loopylucy.tameableplayers.registration;
 
+import co.uk.loopylucy.tameableplayers.TameablePlayers;
 import co.uk.loopylucy.tameableplayers.common.component.ColourData;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -12,7 +13,7 @@ import java.util.function.Supplier;
 
 public class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> COMPONENTS =
-            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, "tameableplayers");
+            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, TameablePlayers.MODID);
 
     public static final Supplier<DataComponentType<ColourData>> ITEM_COLOURS = COMPONENTS.register("item_colours",
             () -> DataComponentType.<ColourData>builder().persistent(ColourData.CODEC).networkSynchronized(ColourData.STREAM_CODEC).build());
@@ -29,5 +30,10 @@ public class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<OverlayInfo>> OVERLAY_INFO =
             COMPONENTS.register("overlay_info", () -> DataComponentType.<OverlayInfo>builder()
                     .persistent(OverlayInfo.CODEC) // Use .persistent() for saved components
+                    .build());
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> WHIP_STATUS =
+            COMPONENTS.register("whip_status", () -> DataComponentType.<Float>builder()
+                    .persistent(Codec.FLOAT)
                     .build());
 }

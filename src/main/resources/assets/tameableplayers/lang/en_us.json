@@ -9,6 +9,7 @@
     "item.tameableplayers.latex_bodysuit": "Burnished Leather Catsuit",
     "item.tameableplayers.blindfold": "Blindfold",
     "item.tameableplayers.cat_ears": "Cat Ears",
+    "item.tameableplayers.whip": "Whip",
 
     "item.tameableplayers.pet_bed": "Pet Bed",
     "block.tameableplayers.pet_bed": "Pet Bed",
@@ -17,6 +18,8 @@
     "item.tameableplayers.gold_ring": "Gold Ring",
     "item.tameableplayers.silver_pendant": "Silver Pendant",
     "item.tameableplayers.gold_pendant": "Gold Pendant",
+
+    "subtitles.tameableplayers.whip_crack": "Whip cracks",
 
     "tameableplayers.configuration.title": "Tameable Players Configs",
     "tameableplayers.configuration.section.tameableplayers.common.toml": "Tameable Players Configs",

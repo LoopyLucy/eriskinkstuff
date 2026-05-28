@@ -1,0 +1,25 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "tameableplayers:item/whip_2"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [-95.54, -76.08, -75.62],
+			"translation": [7.25, 26.75, -9],
+			"scale": [4, 4, 1]
+		},
+		"firstperson_righthand": {
+			"rotation": [-10.05, -64.84, 53.83],
+			"translation": [-4.75, 16.5, -23],
+			"scale": [4, 4, 1]
+		},
+		"gui": {
+			"rotation": [0, 0, 45],
+			"translation": [-14, 16, 0],
+			"scale": [3.6, 3.6, 1]
+		}
+	}
+}

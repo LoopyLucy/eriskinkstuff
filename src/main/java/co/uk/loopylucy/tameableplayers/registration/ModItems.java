@@ -46,6 +46,9 @@ public class ModItems {
     /** The Blindfold. Blinds the player like a pumpkin. */
     public static final DeferredItem<BlindfoldItem>  BLINDFOLD = ITEMS.register("blindfold", BlindfoldItem::new);
 
+    /** The Whip weapon. */
+    public static final DeferredItem<WhipItem> WHIP = ITEMS.register("whip", WhipItem::new);
+
     /** Cat ears item. A cosmetic item based on the player's hair colour */
     public static  final DeferredItem<CatEarsItem> CAT_EARS = ITEMS.register("cat_ears", CatEarsItem::new);
 

@@ -5,5 +5,12 @@
     "sounds": [
       "tameableplayers:clicker"
     ]
+  },
+  "whip_crack": {
+    "category": "player",
+    "subtitle": "subtitles.tameableplayers.whip_crack",
+    "sounds": [
+      "tameableplayers:whip_crack"
+    ]
   }
 }

@@ -34,6 +34,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.LATEX_BODYSUIT);
                         output.accept(ModItems.BLINDFOLD);
                         output.accept(ModItems.CAT_EARS);
+                        output.accept(ModItems.WHIP);
                         output.accept(ModItems.MITTENS);
                         output.accept(ModItems.CLICKER);
                         output.accept(ModItems.PET_BED);

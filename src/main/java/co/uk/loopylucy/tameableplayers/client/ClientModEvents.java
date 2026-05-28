@@ -14,6 +14,7 @@ import co.uk.loopylucy.tameableplayers.registration.ModItems;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -49,6 +50,21 @@ public class ClientModEvents {
             CuriosRendererRegistry.register(ModItems.MITTENS.get(), () -> new MittensRenderer( new MittensModel(Minecraft.getInstance().getEntityModels().bakeLayer(ModModelLayers.MITTENS))));
             CuriosRendererRegistry.register(ModItems.LATEX_BODYSUIT.get(), () -> new SkinOverlayRenderer(ResourceLocation.fromNamespaceAndPath(TameablePlayers.MODID, "textures/entity/latex_bodysuit.png")));
             CuriosRendererRegistry.register(ModItems.CAT_EARS.get(), () -> new HeadItemRenderer(ResourceLocation.fromNamespaceAndPath(TameablePlayers.MODID, "item/models/cat_ears_model"), 1.45F, 0.4F));
+
+            ItemProperties.register(
+                    ModItems.WHIP.get(),
+                    ResourceLocation.fromNamespaceAndPath(TameablePlayers.MODID, "whip_status"),
+                    (itemStack, clientLevel, livingEntity, seed) -> {
+                        // Check if the player is currently swinging an arm
+                        if (livingEntity != null && livingEntity.swinging) {
+                            int tick = livingEntity.swingTime;
+                            if (tick <= 1) return 0.0F;
+                            if (tick <= 3) return 1.0F;
+                            return 2.0F;
+                        }
+                        return 0.0F;
+                    }
+            );
         });
         TameablePlayers.LOGGER.info("Client Loaded and Renderers Registered!");
     }
@@ -132,6 +148,7 @@ public class ClientModEvents {
         registerColour(event, ModItems.CLICKER.get(), (stack, tintIndex) -> ((ClickerItem) stack.getItem()).getColour(stack));
         registerColour(event, ModItems.LATEX_BODYSUIT.get(), (stack, tintIndex) -> ((LatexBodysuitItem) stack.getItem()).getColour(stack));
         registerColour(event, ModItems.BLINDFOLD.get(), (stack, tintIndex) -> ((BlindfoldItem) stack.getItem()).getColour(stack));
+        registerColour(event, ModItems.WHIP.get(), (stack, tintIndex) -> ((WhipItem) stack.getItem()).getColour(stack));
 
         registerColour(event, ModItems.CAT_EARS.get(), (stack, tintIndex) -> {
             CatEarsItem earsItem = (CatEarsItem) stack.getItem();

@@ -1,0 +1,29 @@
+{
+	"format_version": "1.21.11",
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "tameableplayers:item/whip_1"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [16, -90, 0],
+			"translation": [0, 28.25, 9],
+			"scale": [4, 4, 1]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -89, 38],
+			"translation": [8.75, 20.25, -21.25],
+			"scale": [4, 4, 1]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 84, -61],
+			"translation": [1, 16.75, -19.75],
+			"scale": [4, 4, 1]
+		},
+		"gui": {
+			"rotation": [0, 0, 45],
+			"translation": [-14, 16, 0],
+			"scale": [3.6, 3.6, 1]
+		}
+	}
+}
